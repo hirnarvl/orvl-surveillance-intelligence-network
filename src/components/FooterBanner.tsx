@@ -101,7 +101,7 @@ export const FooterBanner: React.FC<FooterBannerProps> = () => {
     <footer className="w-full text-[#eafaf5] font-sans overflow-hidden mt-12 border-t border-white/10">
       {/* Section 1: About this platform with justified text alignment */}
       <div className="bg-[#0e3d3a] p-[16px_20px] sm:p-[20px_28px]">
-        <div className="max-w-[760px]">
+        <div className="max-w-5xl 2xl:max-w-6xl">
           <div className="flex items-center justify-between gap-3 mb-2.5">
             <h3 className="text-[13.5px] font-bold text-[#f2c14e] tracking-[0.2px] flex items-center gap-2 m-0">
               <Info className="w-4 h-4 text-[#f2c14e] shrink-0" />
@@ -130,7 +130,7 @@ export const FooterBanner: React.FC<FooterBannerProps> = () => {
         aria-label={t.footerCombinedSectionTitle || "Data Confidentiality, Legal Disclaimer & Developer Contact"}
         className="bg-[#0b3330] p-[16px_20px] sm:p-[20px_28px] border-t border-white/12"
       >
-        <div className="max-w-[760px] space-y-3.5">
+        <div className="max-w-5xl 2xl:max-w-6xl space-y-3.5">
           {/* Section Header */}
           <div className="flex items-center gap-[10px] flex-wrap">
             <svg className="w-[19px] h-[19px] shrink-0 text-[#f2c14e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">

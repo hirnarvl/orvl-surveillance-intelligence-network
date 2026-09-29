@@ -225,7 +225,7 @@ export const ComplianceTable: React.FC<ComplianceTableProps> = ({ complianceList
       {/* Data View */}
       <div className="mt-3">
         {/* Desktop Table View */}
-        <div className="hidden lg:block overflow-x-auto max-h-96 overflow-y-auto">
+        <div className="hidden md:block overflow-x-auto max-h-[32rem] xl:max-h-[38rem] overflow-y-auto custom-scrollbar">
           <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
             <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 uppercase font-semibold text-[11px] border-b border-slate-200 dark:border-slate-700 z-10">
               <tr>
@@ -332,7 +332,7 @@ export const ComplianceTable: React.FC<ComplianceTableProps> = ({ complianceList
         </div>
 
         {/* Mobile Stacked Card View */}
-        <div className="lg:hidden space-y-3">
+        <div className="md:hidden space-y-3">
           {paginated.map((item, idx) => {
             const rate = item.complianceRate;
             const isChronic = rate < 50;

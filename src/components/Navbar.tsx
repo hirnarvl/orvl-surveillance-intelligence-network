@@ -402,10 +402,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Left Vertical Navigation Sidebar Panel */}
       <aside className={`
         fixed lg:sticky top-0 left-0 z-50 lg:z-30
-        w-72 xl:w-80 h-screen
+        w-72 lg:w-64 xl:w-72 2xl:w-80 h-screen lg:h-[100dvh]
         bg-white dark:bg-slate-900/98 border-r border-slate-200 dark:border-slate-800
         flex flex-col justify-between
-        transition-transform duration-300 ease-in-out
+        transition-all duration-300 ease-in-out
         overflow-y-auto custom-scrollbar shadow-xl lg:shadow-none
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>

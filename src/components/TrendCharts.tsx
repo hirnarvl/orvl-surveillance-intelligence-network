@@ -170,7 +170,7 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({
 
       </div>
       {/* Composed Chart */}
-      <div className="h-72 w-full mt-2">
+      <div className="h-72 sm:h-80 xl:h-96 w-full mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
             <CartesianGrid 

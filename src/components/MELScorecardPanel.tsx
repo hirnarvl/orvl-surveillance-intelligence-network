@@ -183,13 +183,13 @@ export const MELScorecardPanel: React.FC<MELScorecardPanelProps> = ({
         </div>
 
         {/* Zone Filter Tabs */}
-        <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto flex-wrap gap-y-1.5">
+        <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto flex-wrap gap-1.5 max-w-full overflow-x-auto">
           <button
             onClick={() => {
               setSelectedZoneFilter('All');
               if (onSelectZone) onSelectZone('All');
             }}
-            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0 ${
               selectedZoneFilter === 'All'
                 ? 'bg-indigo-600 text-white shadow-md'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -215,7 +215,7 @@ export const MELScorecardPanel: React.FC<MELScorecardPanelProps> = ({
                   setSelectedZoneFilter(zone);
                   if (onSelectZone) onSelectZone(zone);
                 }}
-                className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   selectedZoneFilter === zone
                     ? `${activeColorClass} text-white shadow-md`
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -229,7 +229,7 @@ export const MELScorecardPanel: React.FC<MELScorecardPanelProps> = ({
       </div>
 
       {/* 4 Core MEL Indicator Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5 sm:gap-4">
         
         {/* Metric 1: Reporting Completeness */}
         <div className="bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 p-4 rounded-xl relative overflow-hidden group hover:border-emerald-500/50 transition-all shadow-xs">

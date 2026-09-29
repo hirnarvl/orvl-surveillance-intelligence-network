@@ -1371,202 +1371,205 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
           isFullScreen 
             ? 'fixed inset-0 z-50 rounded-none border-0 h-screen w-screen bg-slate-950' 
             : isPrintMode
-            ? 'h-[520px] sm:h-[580px] w-full bg-slate-900'
-            : 'h-[680px] sm:h-[740px] w-full bg-slate-900'
+            ? 'h-[500px] sm:h-[560px] w-full bg-slate-900'
+            : 'h-[480px] sm:h-[540px] md:h-[580px] lg:h-[calc(100vh-210px)] min-h-[480px] max-h-[740px] 2xl:max-h-[840px] w-full bg-slate-900'
         }`}
       >
         {/* Leaflet Mount Target */}
         <div ref={mapContainerRef} className="w-full h-full z-0 cursor-grab active:cursor-grabbing" />
 
-        {/* Top Floating Control Bar */}
-        <div className="absolute top-3 left-3 z-30 flex items-center space-x-2">
-          {/* Layer Control Toggle Button */}
-          <button
-            onClick={() => setIsLayerControlOpen(prev => !prev)}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
-              isLayerControlOpen
-                ? 'bg-indigo-600 text-white border-indigo-400'
-                : 'bg-slate-900/90 text-slate-200 hover:bg-slate-800 border-slate-700'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span className="hidden sm:inline">Layers</span>
-          </button>
-
-          {/* Weather Panel Toggle Button */}
-          <button
-            onClick={() => setIsWeatherPanelOpen(prev => !prev)}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
-              isWeatherPanelOpen
-                ? 'bg-sky-600 text-white border-sky-400'
-                : 'bg-slate-900/90 text-slate-200 hover:bg-slate-800 border-slate-700'
-            }`}
-          >
-            <CloudSun className="w-4 h-4 text-sky-400" />
-            <span className="hidden sm:inline">Weather Context</span>
-            {liveWeather && (
-              <span className="text-[11px] font-mono text-sky-300 ml-1">
-                {Math.round(liveWeather.temperature)}°C
-              </span>
-            )}
-          </button>
-
-          {/* Zone-Level Boundary Outline Quick Toggle */}
-          <div className="flex items-center bg-slate-900/90 backdrop-blur-md border border-slate-700/90 rounded-xl p-0.5 shadow-lg text-[11px] font-bold">
-            <span className="hidden lg:flex items-center gap-1 text-slate-400 px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-              Zone Outlines:
-            </span>
+        {/* Top Floating Control Bar - Responsive Non-Colliding Layout */}
+        <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 right-2.5 sm:right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          
+          {/* Left Floating Controls */}
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pointer-events-auto max-w-full">
+            {/* Layer Control Toggle Button */}
             <button
-              onClick={() => setZoneOutlineMode('all')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                zoneOutlineMode === 'all'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Show color-coded boundaries for all 10 zones in HRVL & ARVL"
-            >
-              All (10)
-            </button>
-            <button
-              onClick={() => setZoneOutlineMode('hrvl')}
-              className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                zoneOutlineMode === 'hrvl'
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Show HRVL zone boundaries only (East & West Hararghe)"
-            >
-              HRVL (2)
-            </button>
-            <button
-              onClick={() => setZoneOutlineMode('arvl')}
-              className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                zoneOutlineMode === 'arvl'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Show ARVL zone boundaries only (Arsi, West Arsi, Bale, Shewa, Cities)"
-            >
-              ARVL (8)
-            </button>
-            <button
-              onClick={() => setZoneOutlineMode('none')}
-              className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
-                zoneOutlineMode === 'none'
-                  ? 'bg-rose-600/80 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Hide zone boundary outlines"
-            >
-              Off
-            </button>
-          </div>
-
-          {/* Zone Palette Legend Toggle */}
-          {zoneOutlineMode !== 'none' && (
-            <button
-              onClick={() => setIsZoneLegendOpen(prev => !prev)}
-              className={`flex items-center space-x-1.5 px-2.5 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
-                isZoneLegendOpen
-                  ? 'bg-emerald-600 text-white border-emerald-400'
+              onClick={() => setIsLayerControlOpen(prev => !prev)}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
+                isLayerControlOpen
+                  ? 'bg-indigo-600 text-white border-indigo-400'
                   : 'bg-slate-900/90 text-slate-200 hover:bg-slate-800 border-slate-700'
               }`}
-              title="View Color-Coded Zone Legend"
             >
-              <span className="flex items-center -space-x-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-sky-400 border border-slate-900" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-900" />
-              </span>
-              <span className="hidden xl:inline">Zone Palette</span>
+              <Layers className="w-4 h-4" />
+              <span className="hidden sm:inline">Layers</span>
             </button>
-          )}
 
-          {/* Search Woreda or Disease Bar */}
-          <div className="relative hidden md:block">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search woreda or outbreak..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-hidden focus:border-indigo-500 w-48 shadow-lg"
-            />
-            {searchQuery && (
+            {/* Weather Panel Toggle Button */}
+            <button
+              onClick={() => setIsWeatherPanelOpen(prev => !prev)}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
+                isWeatherPanelOpen
+                  ? 'bg-sky-600 text-white border-sky-400'
+                  : 'bg-slate-900/90 text-slate-200 hover:bg-slate-800 border-slate-700'
+              }`}
+            >
+              <CloudSun className="w-4 h-4 text-sky-400" />
+              <span className="hidden sm:inline">Weather Context</span>
+              {liveWeather && (
+                <span className="text-[11px] font-mono text-sky-300 ml-1">
+                  {Math.round(liveWeather.temperature)}°C
+                </span>
+              )}
+            </button>
+
+            {/* Zone-Level Boundary Outline Quick Toggle */}
+            <div className="flex items-center bg-slate-900/90 backdrop-blur-md border border-slate-700/90 rounded-xl p-0.5 shadow-lg text-[11px] font-bold">
+              <span className="hidden lg:flex items-center gap-1 text-slate-400 px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                Zone Outlines:
+              </span>
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-2 text-slate-400 hover:text-white"
+                onClick={() => setZoneOutlineMode('all')}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  zoneOutlineMode === 'all'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Show color-coded boundaries for all 10 zones in HRVL & ARVL"
               >
-                <X className="w-3.5 h-3.5" />
+                All (10)
+              </button>
+              <button
+                onClick={() => setZoneOutlineMode('hrvl')}
+                className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                  zoneOutlineMode === 'hrvl'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Show HRVL zone boundaries only (East & West Hararghe)"
+              >
+                HRVL (2)
+              </button>
+              <button
+                onClick={() => setZoneOutlineMode('arvl')}
+                className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                  zoneOutlineMode === 'arvl'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Show ARVL zone boundaries only (Arsi, West Arsi, Bale, Shewa, Cities)"
+              >
+                ARVL (8)
+              </button>
+              <button
+                onClick={() => setZoneOutlineMode('none')}
+                className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                  zoneOutlineMode === 'none'
+                    ? 'bg-rose-600/80 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Hide zone boundary outlines"
+              >
+                Off
+              </button>
+            </div>
+
+            {/* Zone Palette Legend Toggle */}
+            {zoneOutlineMode !== 'none' && (
+              <button
+                onClick={() => setIsZoneLegendOpen(prev => !prev)}
+                className={`flex items-center space-x-1.5 px-2.5 py-2 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer backdrop-blur-md border ${
+                  isZoneLegendOpen
+                    ? 'bg-emerald-600 text-white border-emerald-400'
+                    : 'bg-slate-900/90 text-slate-200 hover:bg-slate-800 border-slate-700'
+                }`}
+                title="View Color-Coded Zone Legend"
+              >
+                <span className="flex items-center -space-x-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-400 border border-slate-900" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-slate-900" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-900" />
+                </span>
+                <span className="hidden xl:inline">Zone Palette</span>
               </button>
             )}
+
+            {/* Search Woreda or Disease Bar */}
+            <div className="relative hidden md:block">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search woreda or outbreak..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 pr-3 py-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-hidden focus:border-indigo-500 w-36 lg:w-44 xl:w-48 shadow-lg"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Top-Right Floating Controls (Basemap, Zoom, Fullscreen, Export) */}
-        <div className="absolute top-3 right-3 z-30 flex items-center space-x-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-1 rounded-xl shadow-xl">
-          
-          {/* Basemap Select */}
-          <select
-            value={basemap}
-            onChange={(e) => setBasemap(e.target.value as BasemapType)}
-            className="bg-transparent text-slate-200 text-xs font-semibold px-2 py-1 focus:outline-hidden cursor-pointer"
-          >
-            <option value="hybrid" className="bg-slate-900">Hybrid Imagery</option>
-            <option value="satellite" className="bg-slate-900">Satellite</option>
-            <option value="dark" className="bg-slate-900">Dark Matter</option>
-            <option value="voyager" className="bg-slate-900">Carto Light</option>
-            <option value="topo" className="bg-slate-900">Topographic</option>
-          </select>
+          {/* Right Floating Controls (Basemap, Zoom, Fullscreen, Export) */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-1 rounded-xl shadow-xl pointer-events-auto shrink-0">
+            {/* Basemap Select */}
+            <select
+              value={basemap}
+              onChange={(e) => setBasemap(e.target.value as BasemapType)}
+              className="bg-transparent text-slate-200 text-xs font-semibold px-2 py-1 focus:outline-hidden cursor-pointer"
+            >
+              <option value="hybrid" className="bg-slate-900">Hybrid Imagery</option>
+              <option value="satellite" className="bg-slate-900">Satellite</option>
+              <option value="dark" className="bg-slate-900">Dark Matter</option>
+              <option value="voyager" className="bg-slate-900">Carto Light</option>
+              <option value="topo" className="bg-slate-900">Topographic</option>
+            </select>
 
-          <div className="h-4 w-px bg-slate-700" />
+            <div className="h-4 w-px bg-slate-700" />
 
-          {/* Zoom In */}
-          <button
-            onClick={() => mapInstanceRef.current?.zoomIn()}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            title="Zoom In"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
+            {/* Zoom In */}
+            <button
+              onClick={() => mapInstanceRef.current?.zoomIn()}
+              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
 
-          {/* Zoom Out */}
-          <button
-            onClick={() => mapInstanceRef.current?.zoomOut()}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
+            {/* Zoom Out */}
+            <button
+              onClick={() => mapInstanceRef.current?.zoomOut()}
+              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
 
-          {/* Reset Home Extent */}
-          <button
-            onClick={handleResetHome}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            title="Reset to Hararghe Operational View"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+            {/* Reset Home Extent */}
+            <button
+              onClick={handleResetHome}
+              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              title="Reset to Hararghe Operational View"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
 
-          {/* Full-Screen Toggle */}
-          <button
-            onClick={() => setIsFullScreen(prev => !prev)}
-            className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            title={isFullScreen ? "Exit Fullscreen" : "Fullscreen Map"}
-          >
-            {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
+            {/* Full-Screen Toggle */}
+            <button
+              onClick={() => setIsFullScreen(prev => !prev)}
+              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              title={isFullScreen ? "Exit Fullscreen" : "Fullscreen Map"}
+            >
+              {isFullScreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
 
-          {/* Snapshot PNG Export */}
-          <button
-            onClick={handleExportMapImage}
-            disabled={isExportingImage}
-            className="p-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
-            title="Download Map Snapshot (PNG)"
-          >
-            <Download className="w-4 h-4" />
-          </button>
+            {/* Snapshot PNG Export */}
+            <button
+              onClick={handleExportMapImage}
+              disabled={isExportingImage}
+              className="p-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+              title="Download Map Snapshot (PNG)"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Floating Layer Control Panel (Collapsible) */}

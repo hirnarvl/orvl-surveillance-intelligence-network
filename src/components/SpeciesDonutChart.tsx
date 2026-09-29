@@ -167,7 +167,7 @@ export const SpeciesDonutChart: React.FC<SpeciesDonutChartProps> = ({
         </div>
       </div>
 
-      <div className="h-60 w-full mt-2 relative flex items-center justify-center">
+      <div className="h-60 sm:h-64 xl:h-72 w-full mt-2 relative flex items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -205,7 +205,7 @@ export const SpeciesDonutChart: React.FC<SpeciesDonutChartProps> = ({
       </div>
 
       {/* Compact Infographic Legend List with direct key-value alignment */}
-      <div className="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
         {speciesData.map(s => {
           const IconComp = SpeciesIcons[s.name] || SpeciesIcons['Cattle'];
           const pct = ((s.cases / (totalCases || 1)) * 100).toFixed(1);

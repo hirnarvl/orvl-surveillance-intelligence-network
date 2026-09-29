@@ -227,7 +227,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
   return (
     <div className="space-y-4">
       {/* 6 WAHO/WOAH KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3.5 sm:gap-4">
         {kpis.map((item, idx) => {
           const IconComponent = item.icon;
           return (
@@ -236,33 +236,33 @@ export const KPICards: React.FC<KPICardsProps> = ({
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.38, delay: idx * 0.04, ease: [0.22, 1, 0.36, 1] }}
-              className={`group relative p-4 rounded-xl border transition-all duration-300 bg-slate-900 ${item.bg} hover:shadow-xl hover:border-slate-700 hover:bg-slate-900`}
+              className={`group relative p-4 rounded-xl border transition-all duration-300 bg-slate-900 ${item.bg} hover:shadow-xl hover:border-slate-700 hover:bg-slate-900 flex flex-col justify-between`}
             >
-              <div className="flex items-start justify-between relative z-10">
-                <div>
-                  <div className="flex items-center space-x-1.5 mb-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <div className="flex items-start justify-between relative z-10 gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 truncate">
                       {item.title}
                     </span>
-                    <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-slate-800 text-slate-300 rounded border border-slate-700">
+                    <span className="px-1.5 py-0.5 text-[9px] font-extrabold bg-slate-800 text-slate-300 rounded border border-slate-700 shrink-0">
                       {item.badge}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black text-white font-heading tracking-tight mt-1">
+                  <h3 className="text-xl sm:text-2xl font-black text-white font-heading tracking-tight mt-1 truncate" title={item.value}>
                     {item.value}
                   </h3>
                 </div>
-                <div className={`p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner ${item.color}`}>
+                <div className={`p-2 sm:p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 shadow-inner ${item.color} shrink-0`}>
                   <IconComponent className="w-5 h-5" />
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-xs pt-2 border-t border-slate-800/60 relative z-10">
-                <span className="text-slate-400 font-medium text-[11px]">
+              <div className="mt-3 flex items-center justify-between text-xs pt-2 border-t border-slate-800/60 relative z-10 gap-1">
+                <span className="text-slate-400 font-medium text-[11px] truncate" title={item.subtext}>
                   {item.subtext}
                 </span>
                 <span
-                  className={`inline-flex items-center space-x-0.5 font-bold text-[11px] ${
+                  className={`inline-flex items-center space-x-0.5 font-bold text-[11px] shrink-0 ${
                     item.isPositive
                       ? 'text-emerald-400'
                       : 'text-rose-400'
@@ -291,7 +291,7 @@ export const KPICards: React.FC<KPICardsProps> = ({
       </div>
 
       {/* 3 Regional Coverage Cards (WAHO/WOAH Standards) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
         {/* Card 1: Regional Hub Target */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}

@@ -161,7 +161,7 @@ export const CFRTrendChart: React.FC<CFRTrendChartProps> = ({ darkMode, locale, 
       )}
 
       {/* Chart Canvas */}
-      <div className="h-64 w-full mt-2">
+      <div className="h-64 sm:h-68 xl:h-76 w-full mt-2">
         <ResponsiveContainer width="100%" height="100%">
           {viewMode === 'All_Diseases' ? (
             <LineChart data={trendData} margin={{ top: 10, right: 10, left: -15, bottom: 10 }}>

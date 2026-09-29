@@ -619,7 +619,7 @@ export default function App() {
       </div>
 
       {/* Main Right Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen overflow-x-hidden">
 
         {/* Sticky Top Field Print Snapshot Alert Banner (Hidden when printing) */}
         {isPrintFriendlyMode && (
@@ -650,10 +650,10 @@ export default function App() {
         )}
 
         {/* Main Workspace Container */}
-        <main className={`flex-1 w-full mx-auto transition-all duration-300 py-6 pb-24 lg:pb-6 space-y-6 ${
+        <main className={`flex-1 w-full mx-auto transition-all duration-300 py-5 sm:py-6 pb-24 lg:pb-6 space-y-6 ${
           isPortraitMode 
             ? 'max-w-2xl px-3 sm:px-4 bg-slate-900/40 dark:bg-slate-900/60 rounded-3xl my-4 border border-indigo-500/20 shadow-2xl ring-1 ring-indigo-500/10' 
-            : 'max-w-7xl px-4 sm:px-6 lg:px-8'
+            : 'max-w-[1680px] 2xl:max-w-[1920px] px-3.5 sm:px-5 lg:px-6 xl:px-8'
         }`}>
 
           {/* User Account Approval & RBAC Status Banner */}
@@ -877,8 +877,9 @@ export default function App() {
                 </motion.div>
 
                 {/* 2-Column Section: Species Donut Chart + CFR Trend Line Chart */}
-                <div className={`grid gap-6 ${isPortraitMode ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+                <div className={`grid gap-6 ${isPortraitMode ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-2'}`}>
                   <motion.div
+                    className="min-w-0"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.42, delay: 0.44, ease: [0.22, 1, 0.36, 1] }}
@@ -891,6 +892,7 @@ export default function App() {
                   </motion.div>
 
                   <motion.div
+                    className="min-w-0"
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.42, delay: 0.50, ease: [0.22, 1, 0.36, 1] }}
@@ -925,8 +927,9 @@ export default function App() {
             {activeTab === 'Tables' && (
               <div className="space-y-6">
                 {/* Disease Summary & Outbreak Tables */}
-                <div className={`grid gap-6 ${isPortraitMode ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+                <div className={`grid gap-6 ${isPortraitMode ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-2'}`}>
                   <motion.div
+                    className="min-w-0"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
@@ -935,6 +938,7 @@ export default function App() {
                   </motion.div>
 
                   <motion.div
+                    className="min-w-0"
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
