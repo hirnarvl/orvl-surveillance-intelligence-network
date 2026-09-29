@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        const origError = console.error;
+        const origWarn = console.warn;
+        function isBenignViteNotice(arg) {
+          if (!arg) return false;
+          const str = typeof arg === 'string' ? arg : (arg.message || String(arg));
+          return str.includes('[vite]') || (str.includes('WebSocket') && str.includes('vite'));
+        }
+        console.error = function(...args) {
+          if (args.some(isBenignViteNotice)) return;
+          return origError.apply(console, args);
+        };
+        console.warn = function(...args) {
+          if (args.some(isBenignViteNotice)) return;
+          return origWarn.apply(console, args);
+        };
+        window.addEventListener('error', function(e) {
+          if (isBenignViteNotice(e.message) || isBenignViteNotice(e.error)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+          if (isBenignViteNotice(e.reason)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="description" content="Oromia Regional Veterinary Laboratory Surveillance Intelligence Network — Official Animal Disease Surveillance, Diagnostics & Field Epidemiology Portal." />
+    <meta property="og:title" content="ORVL Surveillance Intelligence Network" />
+    <meta property="og:description" content="Oromia Regional Veterinary Laboratory Surveillance Intelligence Network — Official Animal Disease Surveillance, Diagnostics & Field Epidemiology Portal." />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ORVL Network" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script id="google-api-client" src="https://apis.google.com/js/api.js" async defer></script>
+    <script id="google-gsi-client" src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>ORVL Surveillance Intelligence Network | Oromia Regional Veterinary Laboratory Surveillance Intelligence Network</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

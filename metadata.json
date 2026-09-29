@@ -1,0 +1,8 @@
+{
+  "name": "Oromia Regional Veterinary Laboratories Network",
+  "description": "Official Animal Disease Surveillance, Diagnostics & Field Epidemiology Portal",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

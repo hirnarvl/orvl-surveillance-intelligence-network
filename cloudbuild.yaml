@@ -1,0 +1,45 @@
+steps:
+  # 1. Build the multi-stage Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network:$COMMIT_SHA'
+      - '-t'
+      - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network:latest'
+      - '.'
+
+  # 2. Push images to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network'
+
+  # 3. Deploy to Cloud Run in europe-west2 (Independent ORVL service)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'orvl-surveillance-intelligence-network'
+      - '--image'
+      - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network:$COMMIT_SHA'
+      - '--region'
+      - 'europe-west2'
+      - '--project'
+      - 'igneous-fabric-91ttq'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+      - '--set-secrets'
+      - 'GEMINI_API_KEY=GEMINI_API_KEY:latest'
+
+images:
+  - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network:$COMMIT_SHA'
+  - 'europe-west2-docker.pkg.dev/igneous-fabric-91ttq/orvl-repo/orvl-surveillance-intelligence-network:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

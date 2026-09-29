@@ -1,0 +1,562 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   LIVE OUTBREAK SIGNAL & GIS SURVEILLANCE PULSE SYSTEM
+   ========================================================================== */
+
+/* Hardware-accelerated entrance for newly mapped signals */
+@keyframes signalAppear {
+  0% {
+    transform: scale(0.65);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 1. CONFIRMED OUTBREAK: Red Pulse & Expanding Ripple (Strongest: 1.6s Cycle) */
+@keyframes confirmedPulseRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  60% {
+    transform: scale(1.55);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(2.05);
+    opacity: 0;
+  }
+}
+
+@keyframes confirmedCoreGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7), 0 3px 8px rgba(0, 0, 0, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 14px 4px rgba(239, 68, 68, 0.85), 0 4px 14px rgba(239, 68, 68, 0.5);
+    filter: brightness(1.18);
+  }
+}
+
+/* 2. SUSPECTED / FIELD SIGNAL: Amber Pulse (Moderate: 2.2s Cycle) */
+@keyframes suspectedPulseRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.75;
+  }
+  65% {
+    transform: scale(1.45);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+@keyframes suspectedCoreGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6), 0 3px 8px rgba(0, 0, 0, 0.35);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.75), 0 4px 12px rgba(245, 158, 11, 0.4);
+    filter: brightness(1.14);
+  }
+}
+
+/* 3. FIELD INVESTIGATION MISSION: Emerald Pulse (Moderate/Soft: 2.5s Cycle) */
+@keyframes fieldMissionPulseRing {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+
+@keyframes fieldMissionCoreGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(16, 185, 129, 0.65), 0 3px 8px rgba(16, 185, 129, 0.35);
+    filter: brightness(1.12);
+  }
+}
+
+/* 4. HRVL DIAGNOSTIC HUB: Indigo/Blue Diagnostic Activity Pulse (Soft: 3.0s Cycle) */
+@keyframes hubActivityPulseRing {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.65;
+  }
+  75% {
+    transform: scale(1.35);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+@keyframes hubCoreGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px rgba(99, 102, 241, 0.7), 0 4px 14px rgba(79, 70, 229, 0.45);
+    filter: brightness(1.12);
+  }
+}
+
+/* Live Legend Indicator Pulse */
+@keyframes liveDotGlow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.18);
+    box-shadow: 0 0 8px 2.5px rgba(239, 68, 68, 0.85);
+  }
+}
+
+/* Helper utility classes for Leaflet custom HTML markers */
+.live-signal-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+}
+
+/* 
+ * CSS Keyframe Default Fallbacks
+ */
+.live-signal-ring-confirmed {
+  animation: confirmedPulseRing 1.6s ease-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.live-signal-core-confirmed {
+  animation: confirmedCoreGlow 1.6s ease-in-out infinite, signalAppear 0.4s ease-out;
+  transform-origin: center center;
+  will-change: filter, box-shadow;
+}
+
+.live-signal-ring-suspected {
+  animation: suspectedPulseRing 2.2s ease-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.live-signal-core-suspected {
+  animation: suspectedCoreGlow 2.2s ease-in-out infinite, signalAppear 0.4s ease-out;
+  transform-origin: center center;
+  will-change: filter, box-shadow;
+}
+
+.live-signal-ring-mission {
+  animation: fieldMissionPulseRing 2.5s ease-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.live-signal-core-mission {
+  animation: fieldMissionCoreGlow 2.5s ease-in-out infinite, signalAppear 0.4s ease-out;
+  transform-origin: center center;
+  will-change: filter, box-shadow;
+}
+
+.live-signal-ring-hub {
+  animation: hubActivityPulseRing 3.0s ease-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.live-signal-core-hub {
+  animation: hubCoreGlow 3.0s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: filter, box-shadow;
+}
+
+.live-dot-pulse {
+  animation: liveDotGlow 1.8s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+/*
+ * High-Performance requestAnimationFrame (rAF) Hardware-Accelerated Mode
+ * Active when RAF controller is running - synchronizes all markers to a single composite pass
+ */
+.raf-pulse-active .live-signal-ring-confirmed {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) scale(var(--raf-confirmed-scale, 1)) !important;
+  opacity: var(--raf-confirmed-opacity, 0.5) !important;
+}
+
+.raf-pulse-active .live-signal-core-confirmed {
+  animation: signalAppear 0.4s ease-out !important;
+  box-shadow: 0 0 calc(var(--raf-confirmed-glow, 0) * 14px) calc(var(--raf-confirmed-glow, 0) * 4px) rgba(239, 68, 68, 0.8), 0 3px 8px rgba(0, 0, 0, 0.4) !important;
+  filter: brightness(calc(1 + var(--raf-confirmed-glow, 0) * 0.18)) !important;
+}
+
+.raf-pulse-active .live-signal-ring-suspected {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) scale(var(--raf-suspected-scale, 1)) !important;
+  opacity: var(--raf-suspected-opacity, 0.5) !important;
+}
+
+.raf-pulse-active .live-signal-core-suspected {
+  animation: signalAppear 0.4s ease-out !important;
+  box-shadow: 0 0 calc(var(--raf-suspected-glow, 0) * 10px) calc(var(--raf-suspected-glow, 0) * 3px) rgba(245, 158, 11, 0.75), 0 3px 8px rgba(0, 0, 0, 0.35) !important;
+  filter: brightness(calc(1 + var(--raf-suspected-glow, 0) * 0.14)) !important;
+}
+
+.raf-pulse-active .live-signal-ring-mission {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) scale(var(--raf-mission-scale, 1)) !important;
+  opacity: var(--raf-mission-opacity, 0.4) !important;
+}
+
+.raf-pulse-active .live-signal-core-mission {
+  animation: signalAppear 0.4s ease-out !important;
+  box-shadow: 0 0 calc(var(--raf-mission-glow, 0) * 8px) calc(var(--raf-mission-glow, 0) * 2px) rgba(16, 185, 129, 0.65), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  filter: brightness(calc(1 + var(--raf-mission-glow, 0) * 0.12)) !important;
+}
+
+.raf-pulse-active .live-signal-ring-hub {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) scale(var(--raf-hub-scale, 1)) !important;
+  opacity: var(--raf-hub-opacity, 0.3) !important;
+}
+
+.raf-pulse-active .live-signal-core-hub {
+  animation: none !important;
+  box-shadow: 0 0 calc(var(--raf-hub-glow, 0) * 12px) calc(var(--raf-hub-glow, 0) * 3px) rgba(99, 102, 241, 0.7), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  filter: brightness(calc(1 + var(--raf-hub-glow, 0) * 0.12)) !important;
+}
+
+.raf-pulse-active .live-dot-pulse {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) scale(var(--raf-dot-scale, 1)) !important;
+  opacity: var(--raf-dot-opacity, 1) !important;
+}
+
+/* Ensure Leaflet icon containers do not clip outer expanding pulse rings */
+.leaflet-marker-icon.custom-outbreak-pin,
+.leaflet-marker-icon.custom-hub-icon,
+.leaflet-marker-icon.custom-field-investigation-pin {
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .live-signal-ring-confirmed,
+  .live-signal-core-confirmed,
+  .live-signal-ring-suspected,
+  .live-signal-core-suspected,
+  .live-signal-ring-mission,
+  .live-signal-core-mission,
+  .live-signal-ring-hub,
+  .live-signal-core-hub,
+  .live-dot-pulse,
+  .raf-pulse-active .live-signal-ring-confirmed,
+  .raf-pulse-active .live-signal-core-confirmed,
+  .raf-pulse-active .live-signal-ring-suspected,
+  .raf-pulse-active .live-signal-core-suspected,
+  .raf-pulse-active .live-signal-ring-mission,
+  .raf-pulse-active .live-signal-core-mission,
+  .raf-pulse-active .live-signal-ring-hub,
+  .raf-pulse-active .live-signal-core-hub,
+  .raf-pulse-active .live-dot-pulse {
+    animation: none !important;
+    transform: none !important;
+    opacity: 0.5 !important;
+  }
+}
+
+/* ==========================================================================
+   HRVL INTERACTIVE MAP HOVER-CARD TOOLTIP SYSTEM
+   ========================================================================== */
+.leaflet-tooltip.hrvl-hovercard-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+.leaflet-tooltip.hrvl-hovercard-tooltip::before {
+  display: none !important;
+}
+
+/* ==========================================================================
+   WOREDA BOUNDARY VECTOR GLOW & HOVER-STATE ANIMATIONS
+   ========================================================================== */
+
+/* Smooth dynamic transitions on all GIS boundary vector paths */
+path.leaflet-interactive.woreda-boundary-feature,
+path.woreda-boundary-feature {
+  transition: stroke 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke-opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              fill 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              fill-opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+/* Hover-state glowing aura & boundary elevation */
+path.woreda-boundary-hover,
+path.leaflet-interactive.woreda-boundary-hover {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.95))
+          drop-shadow(0 0 10px rgba(56, 189, 248, 0.9))
+          drop-shadow(0 0 18px rgba(14, 165, 233, 0.75)) !important;
+  animation: woredaPolygonHoverGlow 1.5s ease-in-out infinite alternate !important;
+}
+
+@keyframes woredaPolygonHoverGlow {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85))
+            drop-shadow(0 0 8px rgba(56, 189, 248, 0.85))
+            drop-shadow(0 0 14px rgba(14, 165, 233, 0.65));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1))
+            drop-shadow(0 0 12px rgba(129, 140, 248, 0.95))
+            drop-shadow(0 0 20px rgba(99, 102, 241, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+            drop-shadow(0 0 15px rgba(14, 165, 233, 1))
+            drop-shadow(0 0 24px rgba(56, 189, 248, 0.9));
+  }
+}
+
+/* Selected woreda persistent vibrant emerald/cyan halo */
+path.woreda-boundary-selected,
+path.leaflet-interactive.woreda-boundary-selected {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 12px rgba(16, 185, 129, 0.95))
+          drop-shadow(0 0 22px rgba(5, 150, 105, 0.85)) !important;
+  animation: woredaSelectedPulse 1.8s ease-in-out infinite alternate !important;
+}
+
+@keyframes woredaSelectedPulse {
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9))
+            drop-shadow(0 0 10px rgba(16, 185, 129, 0.85))
+            drop-shadow(0 0 18px rgba(5, 150, 105, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+            drop-shadow(0 0 16px rgba(16, 185, 129, 1))
+            drop-shadow(0 0 28px rgba(6, 182, 212, 0.85));
+  }
+}
+
+/* ==========================================================================
+   PRINT / PDF EXPORT STANDARDIZATION
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm 15mm 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .report-document {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
+
+  .report-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .report-chart {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure map and legend print cleanly */
+  .leaflet-container {
+    background: #f8fafc !important;
+  }
+
+  /* Hide interactive controls in print */
+  .leaflet-control-zoom,
+  .leaflet-control-attribution {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   ARVL & REGIONAL ZONE SELECTION POPUP (INTERACTIVE GIS OVERLAY)
+   ========================================================================== */
+
+.custom-zone-selection-popup .leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(71, 85, 105, 0.75) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.55), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  color: #f8fafc !important;
+  padding: 0 !important;
+}
+
+.custom-zone-selection-popup .leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+}
+
+.custom-zone-selection-popup .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border: 1px solid rgba(71, 85, 105, 0.75) !important;
+}
+
+.custom-zone-selection-popup a.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 0 !important;
+  top: 10px !important;
+  right: 10px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(71, 85, 105, 0.5) !important;
+  transition: all 0.15s ease !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.custom-zone-selection-popup a.leaflet-popup-close-button:hover,
+.custom-zone-selection-popup a.leaflet-popup-close-button:active {
+  color: #ffffff !important;
+  background: rgba(51, 65, 85, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.8) !important;
+}
+
+/* Touch & Mobile PWA optimizations */
+@media (max-width: 640px) {
+  .custom-zone-selection-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+
+  .custom-zone-selection-popup .leaflet-popup-content {
+    margin: 10px 12px !important;
+  }
+
+  .custom-zone-selection-popup a.leaflet-popup-close-button {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    top: 8px !important;
+    right: 8px !important;
+  }
+}
+
+
+

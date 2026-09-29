@@ -1,0 +1,219 @@
+{
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "HRVL / ARVL Surveillance",
+        "supportEmail": "hirnarvl@oromiavet.gov.et",
+        "authorizedRedirectUris": [
+          "http://localhost:3000"
+        ]
+      }
+    }
+  },
+  "entities": {
+    "baselineRecord": {
+      "title": "BaselineRecord",
+      "description": "Historical verified HRVL-area ADNIS surveillance record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "sourceBatchId": { "type": "string" },
+        "sourceArchiveFile": { "type": "string" },
+        "sourceRowIndex": { "type": "number" },
+        "date": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "reportingPeriod": { "type": "string" },
+        "region": { "type": "string" },
+        "zone": { "type": "string" },
+        "zoneAbbreviation": { "type": "string" },
+        "woreda": { "type": "string" },
+        "rawWoredaReported": { "type": "string" },
+        "kebele": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "disease": { "type": "string" },
+        "species": { "type": "string" },
+        "cases": { "type": "number" },
+        "deaths": { "type": "number" },
+        "isZeroReporting": { "type": "boolean" },
+        "outbreakStatus": { "type": "string" },
+        "reporterName": { "type": "string" },
+        "reporterPhone": { "type": "string" },
+        "isBaseline": { "type": "boolean" },
+        "dataQualityStatus": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["disease", "species", "woreda", "zone", "date"]
+    },
+    "personnel": {
+      "title": "Personnel",
+      "description": "Veterinary reporter / focal person directory associated with ADNIS reports",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "assignedWoreda": { "type": "string" },
+        "assignedZone": { "type": "string" },
+        "role": { "type": "string" },
+        "associatedRecordsCount": { "type": "number" },
+        "firstReportDate": { "type": "string" },
+        "lastReportDate": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["name", "phone", "assignedWoreda", "assignedZone"]
+    },
+    "surveillanceRecord": {
+      "title": "SurveillanceRecord",
+      "description": "Veterinary epizootiological surveillance and outbreak record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "disease": { "type": "string" },
+        "species": { "type": "string" },
+        "region": { "type": "string" },
+        "zone": { "type": "string" },
+        "woreda": { "type": "string" },
+        "kebele": { "type": "string" },
+        "cases": { "type": "number" },
+        "deaths": { "type": "number" },
+        "date": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["disease", "species"]
+    },
+    "outbreak": {
+      "title": "Outbreak",
+      "description": "Veterinary epizootiological outbreak incident report",
+      "type": "object",
+      "properties": {
+        "region": { "type": "string" },
+        "zone": { "type": "string" },
+        "woreda": { "type": "string" },
+        "disease": { "type": "string" },
+        "species": { "type": "string" },
+        "cases": { "type": "number" },
+        "deaths": { "type": "number" },
+        "date": { "type": "string" }
+      },
+      "required": ["disease", "species", "cases", "date"]
+    },
+    "laboratory": {
+      "title": "Laboratory",
+      "description": "Veterinary diagnostic laboratory facility metadata and operational catchment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "shortName": { "type": "string" },
+        "logo": { "type": "string" },
+        "region": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "maintenance", "onboarding"] }
+      },
+      "required": ["id", "name", "shortName", "logo", "status"]
+    },
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "Structured multi-laboratory user profile with role-based access control, account approval status and granular permissions",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "photoURL": { "type": "string" },
+        "region": { "type": "string" },
+        "zone": { "type": "string" },
+        "district": { "type": "string" },
+        "professionalDesignation": { "type": "string" },
+        "organization": { "type": "string" },
+        "role": { "type": "string" },
+        "roles": { "type": "array", "items": { "type": "string" } },
+        "laboratories": { "type": "array", "items": { "type": "string" } },
+        "permissions": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "approved", "active", "rejected", "suspended"] },
+        "accountStatus": { "type": "string", "enum": ["pending", "approved", "active", "rejected", "suspended"] },
+        "emailVerified": { "type": "boolean" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "approvedAt": { "type": "number" },
+        "approvedBy": { "type": "string" },
+        "approvedByName": { "type": "string" },
+        "rejectionReason": { "type": "string" },
+        "suspensionReason": { "type": "string" },
+        "lastLoginAt": { "type": "number" }
+      },
+      "required": ["email", "status"]
+    },
+    "auditLog": {
+      "title": "AuditLog",
+      "description": "Security and administrative audit trail recording user management and privilege events",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "actorUserId": { "type": "string" },
+        "actorName": { "type": "string" },
+        "actorRole": { "type": "string" },
+        "action": { "type": "string" },
+        "targetUserId": { "type": "string" },
+        "targetUserName": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "organizationLevel": { "type": "string" },
+        "details": { "type": "string" }
+      },
+      "required": ["actorUserId", "actorName", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/laboratories/{laboratoryId}": {
+      "schema": { "$ref": "#/entities/laboratory" },
+      "description": "Regional veterinary laboratories and institutional workspaces"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/userProfile" },
+      "description": "Role-based user accounts, organizational assignments, and approval statuses"
+    },
+    "/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/auditLog" },
+      "description": "Administrative actions, role modifications, and system security event audit logs"
+    },
+    "/baseline_data/{recordId}": {
+      "schema": { "$ref": "#/entities/baselineRecord" },
+      "description": "Historical verified HRVL-area 2-year ADNIS baseline surveillance records"
+    },
+    "/current_data/{recordId}": {
+      "schema": { "$ref": "#/entities/baselineRecord" },
+      "description": "New and live ongoing surveillance stream"
+    },
+    "/personnel/{personnelId}": {
+      "schema": { "$ref": "#/entities/personnel" },
+      "description": "Veterinary reporters and focal persons extracted from operational records"
+    },
+    "/metadata/{metaDoc}": {
+      "description": "Operational dataset versioning, sync timestamps and coverage metrics"
+    },
+    "/import_batches/{batchId}": {
+      "description": "Audit trail of historical ADNIS import batches and parsing ledgers"
+    },
+    "/raw_staging_archive/{stagingId}": {
+      "description": "Staging and quarantined non-HRVL national records preserved for audit"
+    },
+    "/surveillanceRecords/{recordId}": {
+      "schema": { "$ref": "#/entities/surveillanceRecord" },
+      "description": "Veterinary surveillance records synchronized across web and mobile"
+    },
+    "/outbreaks/{outbreakId}": {
+      "schema": { "$ref": "#/entities/outbreak" },
+      "description": "Outbreak events registered by veterinary epidemiologists"
+    },
+    "/surveillance/{surveillanceId}": {
+      "description": "Field disease surveillance records"
+    },
+    "/test/{testId}": {
+      "description": "Health check and connection verification"
+    }
+  }
+}

@@ -1,0 +1,490 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // HELPER FUNCTIONS & RBAC CORE
+    // -------------------------------------------------------------------------
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Bootstrap Super Admin definition:
+    // Preserves clexhena@gmail.com as primary bootstrap Super Admin
+    // and retains henok.abebe@hrvl.health.et as recognized bootstrap admin from existing rules.
+    function isBootstrapAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'clexhena@gmail.com' ||
+        request.auth.token.email == 'henok.abebe@hrvl.health.et'
+      );
+    }
+
+    function hasUserDoc() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isApproved() {
+      return isSignedIn() && (
+        isBootstrapAdmin() ||
+        (
+          hasUserDoc() && (
+            (getUserData().get('status', '') == 'approved') ||
+            (getUserData().get('status', '') == 'active') ||
+            (getUserData().get('accountStatus', '') == 'approved') ||
+            (getUserData().get('accountStatus', '') == 'active')
+          )
+        )
+      );
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        isBootstrapAdmin() ||
+        (
+          isApproved() && hasUserDoc() && (
+            ('SUPER_ADMIN' in getUserData().get('roles', [])) ||
+            (getUserData().get('role', '') == 'SUPER_ADMIN') ||
+            (getUserData().get('role', '') == 'platform_admin')
+          )
+        )
+      );
+    }
+
+    // Laboratory Administrator (HRVL or ARVL or general LAB_ADMIN role)
+    function isLabAdmin() {
+      return isSuperAdmin() || (
+        isApproved() && hasUserDoc() && (
+          ('LAB_ADMIN' in getUserData().get('roles', [])) ||
+          (getUserData().get('role', '') == 'LAB_ADMIN') ||
+          (getUserData().get('role', '') == 'lab_manager') ||
+          (getUserData().get('role', '') == 'admin_hrvl')
+        )
+      );
+    }
+
+    // Normalizes lab IDs and matches user laboratory authorization:
+    // Returns true if user has specific access to HRVL, ARVL, or all-laboratory access.
+    function isLabAuthorized(recordLabId) {
+      return isSuperAdmin() || (
+        isApproved() && hasUserDoc() && (
+          // Unassigned / non-scoped records can be read/written by approved members of either lab,
+          // but if laboratoryId is set, it MUST match the user's laboratory authorization.
+          recordLabId == null ||
+          recordLabId == '' ||
+          (recordLabId in getUserData().get('laboratories', [])) ||
+          ('all' in getUserData().get('laboratories', [])) ||
+          (getUserData().get('assignedLaboratory', '') == 'all') ||
+          (
+            (recordLabId == 'hrvl' || recordLabId == 'HRVL') && (
+              ('HRVL' in getUserData().get('laboratories', [])) ||
+              ('hrvl' in getUserData().get('laboratories', [])) ||
+              ('hrvl' in getUserData().get('accessibleLaboratories', [])) ||
+              ('HRVL' in getUserData().get('accessibleLaboratories', [])) ||
+              (getUserData().get('assignedLaboratory', '') == 'hrvl') ||
+              (getUserData().get('assignedLaboratory', '') == 'HRVL')
+            )
+          ) ||
+          (
+            (recordLabId == 'arvl' || recordLabId == 'ARVL') && (
+              ('ARVL' in getUserData().get('laboratories', [])) ||
+              ('arvl' in getUserData().get('laboratories', [])) ||
+              ('arvl' in getUserData().get('accessibleLaboratories', [])) ||
+              ('ARVL' in getUserData().get('accessibleLaboratories', [])) ||
+              (getUserData().get('assignedLaboratory', '') == 'arvl') ||
+              (getUserData().get('assignedLaboratory', '') == 'ARVL')
+            )
+          )
+        )
+      );
+    }
+
+    // Specifically checks if an administrator is authorized for target lab scope
+    function isLabAdminFor(targetLabId) {
+      return isSuperAdmin() || (isLabAdmin() && isLabAuthorized(targetLabId));
+    }
+
+    // Validates whether an actor can administer a target user profile:
+    // SuperAdmin can manage any user.
+    // LabAdmin cannot manage SuperAdmins and can only manage users within their own laboratory scope.
+    function canAdministerTargetProfile(existingData) {
+      return isSuperAdmin() || (
+        isLabAdmin() && (
+          existingData.get('role', '') != 'SUPER_ADMIN' &&
+          existingData.get('role', '') != 'platform_admin' &&
+          !('SUPER_ADMIN' in existingData.get('roles', [])) &&
+          !('platform_admin' in existingData.get('roles', [])) &&
+          isLabAuthorized(existingData.get('assignedLaboratory', ''))
+        )
+      );
+    }
+
+    // Role-based write privilege for data records
+    function hasWritePermission() {
+      return isSuperAdmin() || isLabAdmin() || (
+        isApproved() && hasUserDoc() && (
+          ('reports.create' in getUserData().get('permissions', [])) ||
+          ('data.import' in getUserData().get('permissions', [])) ||
+          ('data.manage' in getUserData().get('permissions', [])) ||
+          ('EPIDEMIOLOGIST' in getUserData().get('roles', [])) ||
+          (getUserData().get('role', '') == 'epidemiologist') ||
+          (getUserData().get('role', '') == 'field_veterinarian')
+        )
+      );
+    }
+
+    // Validates surveillance epidemiological constraints
+    function isValidSurveillanceRecordData(data) {
+      return (
+        data.get('cases', 0) >= 0 &&
+        data.get('deaths', 0) >= 0 &&
+        data.get('at_risk', 0) >= 0 &&
+        data.get('deaths', 0) <= data.get('cases', 0) &&
+        data.get('cases', 0) <= data.get('at_risk', 0)
+      );
+    }
+
+    // Validates zero-report constraints
+    function isValidZeroReportData(data) {
+      return (
+        data.get('cases', 0) == 0 &&
+        data.get('deaths', 0) == 0
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. DEFAULT DENY
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. LABORATORIES METADATA COLLECTION
+    // -------------------------------------------------------------------------
+    match /laboratories/{laboratoryId} {
+      allow read: if isSignedIn();
+      allow write: if isSuperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. USER PROFILES & MULTI-LABORATORY RBAC
+    // -------------------------------------------------------------------------
+    match /users/{userId} {
+      // Get: user themselves or authorized admins
+      allow get: if isSignedIn() && (request.auth.uid == userId || isSuperAdmin() || isLabAdmin());
+      // List: only administrators
+      allow list: if isSignedIn() && (isSuperAdmin() || isLabAdmin());
+
+      // Create: User can only create their own profile document
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && (
+        isBootstrapAdmin() || (
+          // Ordinary users must start in pending state with zero elevated privileges
+          request.resource.data.get('status', 'pending') == 'pending' &&
+          request.resource.data.get('accountStatus', 'pending') == 'pending' &&
+          request.resource.data.get('approvedAt', null) == null &&
+          request.resource.data.get('approvedBy', null) == null &&
+          request.resource.data.get('role', 'LABORATORY_USER') != 'SUPER_ADMIN' &&
+          request.resource.data.get('role', 'LABORATORY_USER') != 'platform_admin' &&
+          request.resource.data.get('role', 'LABORATORY_USER') != 'LAB_ADMIN' &&
+          !('SUPER_ADMIN' in request.resource.data.get('roles', [])) &&
+          !('platform_admin' in request.resource.data.get('roles', [])) &&
+          !('LAB_ADMIN' in request.resource.data.get('roles', []))
+        )
+      );
+
+      // Update:
+      // A. Super Admin: full access
+      // B. Lab Admin: can manage non-SuperAdmin users within their own laboratory, cannot elevate to SuperAdmin
+      // C. Self-Update: strictly locked down; users cannot modify status, roles, labs, permissions, approvals
+      allow update: if isSignedIn() && (
+        isSuperAdmin() ||
+        (
+          isLabAdmin() &&
+          canAdministerTargetProfile(resource.data) &&
+          // Lab Admin cannot elevate anyone to Super Admin or platform_admin
+          request.resource.data.get('role', '') != 'SUPER_ADMIN' &&
+          request.resource.data.get('role', '') != 'platform_admin' &&
+          !('SUPER_ADMIN' in request.resource.data.get('roles', [])) &&
+          !('platform_admin' in request.resource.data.get('roles', [])) &&
+          // Lab Admin can only assign laboratories they are authorized for
+          (
+            request.resource.data.get('assignedLaboratory', null) == null ||
+            isLabAuthorized(request.resource.data.get('assignedLaboratory', ''))
+          )
+        ) ||
+        (
+          request.auth.uid == userId &&
+          // Enforce immutable security fields on self-update:
+          request.resource.data.get('status', null) == resource.data.get('status', null) &&
+          request.resource.data.get('accountStatus', null) == resource.data.get('accountStatus', null) &&
+          request.resource.data.get('roles', null) == resource.data.get('roles', null) &&
+          request.resource.data.get('role', null) == resource.data.get('role', null) &&
+          request.resource.data.get('laboratories', null) == resource.data.get('laboratories', null) &&
+          request.resource.data.get('assignedLaboratory', null) == resource.data.get('assignedLaboratory', null) &&
+          request.resource.data.get('accessibleLaboratories', null) == resource.data.get('accessibleLaboratories', null) &&
+          request.resource.data.get('permissions', null) == resource.data.get('permissions', null) &&
+          request.resource.data.get('approvedAt', null) == resource.data.get('approvedAt', null) &&
+          request.resource.data.get('approvedBy', null) == resource.data.get('approvedBy', null)
+        )
+      );
+
+      // Delete: only Super Admin can delete user profiles
+      allow delete: if isSuperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. SECURITY & ADMINISTRATIVE AUDIT TRAIL (APPEND-ONLY)
+    // -------------------------------------------------------------------------
+    match /auditLogs/{logId} {
+      allow get, list: if isSignedIn() && (isSuperAdmin() || isLabAdmin());
+      // Append-only creation: actorUserId must match the authenticated UID
+      allow create: if isSignedIn() && isValidId(logId) && (
+        isBootstrapAdmin() ||
+        request.resource.data.get('actorUserId', '') == request.auth.uid
+      );
+      // Strictly immutable: no updates or deletes permitted
+      allow update, delete: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. HISTORICAL BASELINE SURVEILLANCE DATA
+    // -------------------------------------------------------------------------
+    match /baseline_data/{recordId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(recordId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. CURRENT ONGOING SURVEILLANCE DATA
+    // -------------------------------------------------------------------------
+    match /current_data/{recordId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(recordId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. NATIVE ADNIS-V2 FIELD / OUTBREAK REPORTS
+    // -------------------------------------------------------------------------
+    match /adnis_field_reports/{reportId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(reportId) && isApproved() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null)) &&
+        isValidSurveillanceRecordData(request.resource.data);
+      allow update: if isSignedIn() && isApproved() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null)) &&
+        isValidSurveillanceRecordData(request.resource.data);
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. NATIVE ADNIS-V2 ZERO SURVEILLANCE REPORTS
+    // -------------------------------------------------------------------------
+    match /adnis_zero_reports/{reportId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(reportId) && isApproved() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null)) &&
+        isValidZeroReportData(request.resource.data);
+      allow update: if isSignedIn() && isApproved() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null)) &&
+        isValidZeroReportData(request.resource.data);
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. PERSONNEL & REPORTER DIRECTORY
+    // -------------------------------------------------------------------------
+    match /personnel/{personnelId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(personnelId) && isApproved() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. IMPORT BATCHES & PARSING LEDGERS
+    // -------------------------------------------------------------------------
+    match /import_batches/{batchId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(batchId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. RAW STAGING ARCHIVE
+    // -------------------------------------------------------------------------
+    match /raw_staging_archive/{stagingId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(stagingId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 12. GENERAL SURVEILLANCE RECORDS
+    // -------------------------------------------------------------------------
+    match /surveillanceRecords/{recordId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(recordId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 13. OUTBREAK EVENTS
+    // -------------------------------------------------------------------------
+    match /outbreaks/{outbreakId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isValidId(outbreakId) && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 14. LEGACY SURVEILLANCE STREAM
+    // -------------------------------------------------------------------------
+    match /surveillance/{surveillanceId} {
+      allow get, list: if isSignedIn() && isApproved() && (
+        resource == null || isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+      allow create: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow update: if isSignedIn() && isApproved() &&
+        hasWritePermission() &&
+        isLabAuthorized(resource.data.get('laboratoryId', null)) &&
+        isLabAuthorized(request.resource.data.get('laboratoryId', null));
+      allow delete: if isSuperAdmin() || (
+        isLabAdmin() && isLabAuthorized(resource.data.get('laboratoryId', null))
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 15. METADATA
+    // -------------------------------------------------------------------------
+    match /metadata/{metaDoc} {
+      allow get, list: if isSignedIn();
+      allow write: if isSuperAdmin() || isLabAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 16. ARVL VACCINATION CALENDAR MASTER DATASET
+    // Public read, ARVL Admin or Super Admin write
+    // -------------------------------------------------------------------------
+    match /arvl_vaccination_calendar/{calendarId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSignedIn() && isApproved() && isLabAdminFor('ARVL');
+    }
+
+    // -------------------------------------------------------------------------
+    // 17. ARVL VACCINE DICTIONARY
+    // Public read, ARVL Admin or Super Admin write
+    // -------------------------------------------------------------------------
+    match /arvl_vaccine_dictionary/{dictId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSignedIn() && isApproved() && isLabAdminFor('ARVL');
+    }
+
+    // -------------------------------------------------------------------------
+    // 18. ARVL VACCINATION AUDIT LOG (APPEND-ONLY)
+    // -------------------------------------------------------------------------
+    match /arvl_vaccination_audit/{auditId} {
+      allow get, list: if isSignedIn() && isApproved() && isLabAdminFor('ARVL');
+      allow create: if isSignedIn() && isApproved() && isLabAuthorized('ARVL') && (
+        isBootstrapAdmin() ||
+        request.resource.data.get('actorUserId', '') == request.auth.uid
+      );
+      allow update, delete: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 19. HEALTH CHECK / CONNECTION VERIFICATION
+    // -------------------------------------------------------------------------
+    match /test/{testId} {
+      allow read: if isSignedIn() && isApproved();
+      allow write: if isSuperAdmin();
+    }
+  }
+}
