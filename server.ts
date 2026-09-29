@@ -505,7 +505,7 @@ Generate a comprehensive, publication-ready Epidemiological Narrative Summary & 
 
     Return ONLY raw valid JSON.`;
 
-    const candidateModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    const candidateModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
     let narrativeText = '';
 
     for (const modelName of candidateModels) {
@@ -525,10 +525,18 @@ Generate a comprehensive, publication-ready Epidemiological Narrative Summary & 
         }
       } catch (err: any) {
         const errMsg = err?.message || String(err);
-        const isUnavailableOrRateLimited = errMsg.includes('503') || errMsg.includes('429') || errMsg.includes('UNAVAILABLE') || errMsg.includes('high demand');
+        const isUnavailableOrRateLimited = 
+          errMsg.includes('503') || 
+          errMsg.includes('429') || 
+          errMsg.includes('UNAVAILABLE') || 
+          errMsg.includes('high demand') ||
+          errMsg.includes('resource_exhausted') ||
+          errMsg.includes('RESOURCE_EXHAUSTED') ||
+          errMsg.includes('quota') ||
+          errMsg.includes('Quota');
         
         if (isUnavailableOrRateLimited) {
-          console.log(`Model ${modelName} is temporarily experiencing high demand/rate limits. Attempting fallback model...`);
+          console.log(`Model ${modelName} is temporarily rate-limited or quota exhausted. Attempting fallback model...`);
           // Brief pause before trying next candidate
           await new Promise((resolve) => setTimeout(resolve, 300));
         } else {
