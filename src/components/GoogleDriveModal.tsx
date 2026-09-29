@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { X, HardDrive, ExternalLink, ShieldCheck, RefreshCw, CheckCircle2, AlertCircle, Database, FileSpreadsheet } from 'lucide-react';
+import { X, HardDrive, ExternalLink, ShieldCheck, RefreshCw, CheckCircle2, AlertCircle, Database, FileSpreadsheet, FolderSearch, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLaboratory } from '../contexts/LaboratoryContext';
+import { openGooglePicker } from '../utils/googlePicker';
+import { downloadDriveFileArrayBuffer } from '../utils/googleDrive';
+import * as XLSX from 'xlsx';
+import { validateWoreda, detectZone } from '../utils/fuzzyMatch';
+import { SurveillanceRecord } from '../types';
 
 interface GoogleDriveModalProps {
   isOpen: boolean;
@@ -18,6 +23,7 @@ interface GoogleDriveModalProps {
 export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({ 
   isOpen, 
   onClose,
+  onImportRecords,
   onSyncAdnisArchive,
   onSyncAnnualData,
   isSyncingAdnis = false,
@@ -29,6 +35,8 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
   const [authError, setAuthError] = useState<string | null>(null);
   const [showManualInput, setShowManualInput] = useState(false);
   const [manualToken, setManualToken] = useState('');
+  const [pickerStatus, setPickerStatus] = useState<string | null>(null);
+  const [pickerLoading, setPickerLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -43,6 +51,104 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
       }
     } finally {
       setAuthLoading(false);
+    }
+  };
+
+  const handleOpenPicker = async () => {
+    try {
+      setPickerLoading(true);
+      setPickerStatus(null);
+      let token = accessToken;
+      if (!token) {
+        token = await connectGoogleDrive();
+      }
+      if (!token) {
+        setPickerLoading(false);
+        return;
+      }
+
+      await openGooglePicker({
+        accessToken: token,
+        title: 'Select Surveillance Spreadsheet or Archive File',
+        viewMode: 'all',
+        onPicked: async (doc) => {
+          try {
+            setPickerStatus(`Downloading & parsing "${doc.name}"...`);
+            const arrayBuffer = await downloadDriveFileArrayBuffer(token!, doc.id, doc.mimeType);
+            const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array', cellDates: true });
+            
+            const imported: SurveillanceRecord[] = [];
+            wb.SheetNames.forEach(sheetName => {
+              const ws = wb.Sheets[sheetName];
+              if (!ws) return;
+              const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+              rows.forEach((r, idx) => {
+                const getCol = (...names: string[]) => {
+                  for (const n of names) {
+                    const k = Object.keys(r).find(key => key.trim().toLowerCase() === n.toLowerCase());
+                    if (k && r[k] !== undefined && r[k] !== '') return r[k];
+                  }
+                  return '';
+                };
+
+                const rawWoreda = String(getCol('woreda', 'wereda', 'district', 'location') || '').trim();
+                const woredaMatch = validateWoreda(rawWoreda);
+                const cases = Number(getCol('cases', 'cases_count', 'morbidity') || 0);
+                const deaths = Number(getCol('deaths', 'fatalities', 'mortality') || 0);
+                const disease = String(getCol('disease', 'outbreak', 'event', 'condition') || 'Foot-and-Mouth Disease (FMD)');
+                const species = String(getCol('species', 'livestock', 'animal') || 'Cattle');
+
+                let dateVal = getCol('date', 'report_date', 'timestamp', 'year');
+                let dateStr = new Date().toISOString().split('T')[0];
+                if (dateVal instanceof Date) {
+                  dateStr = dateVal.toISOString().split('T')[0];
+                } else if (typeof dateVal === 'string' && dateVal.trim()) {
+                  dateStr = dateVal.trim();
+                }
+
+                imported.push({
+                  id: `gdrive-${doc.id}-${idx}`,
+                  date: dateStr,
+                  timestamp: new Date(dateStr).getTime() || Date.now(),
+                  woreda: woredaMatch.isValid ? woredaMatch.woredaName : rawWoreda || 'Unknown Woreda',
+                  zone: woredaMatch.isValid ? woredaMatch.zone : detectZone(rawWoreda, String(getCol('zone', 'region'))),
+                  lat: woredaMatch.matchedWoreda ? woredaMatch.matchedWoreda.lat : 9.2,
+                  lng: woredaMatch.matchedWoreda ? woredaMatch.matchedWoreda.lng : 41.5,
+                  disease,
+                  species,
+                  cases,
+                  deaths,
+                  risk: deaths > 5 ? 'Critical' : cases > 20 ? 'High' : 'Medium',
+                  laboratoryId: currentLabInfo.id,
+                  comment: `Google Drive: ${doc.name}`,
+                  sourceFile: doc.name,
+                  dataQualityStatus: woredaMatch.status
+                });
+              });
+            });
+
+            if (imported.length > 0 && onImportRecords) {
+              onImportRecords(imported);
+              setPickerStatus(`Successfully imported ${imported.length} records from "${doc.name}"!`);
+            } else {
+              setPickerStatus(`Loaded "${doc.name}" successfully.`);
+            }
+          } catch (err: any) {
+            console.error('Error reading file from Picker:', err);
+            setPickerStatus(`Failed to process "${doc.name}": ${err?.message || 'Invalid format'}`);
+          } finally {
+            setPickerLoading(false);
+          }
+        },
+        onCancel: () => {
+          setPickerLoading(false);
+        }
+      });
+    } catch (err: any) {
+      console.error('Error launching Google Picker:', err);
+      setPickerStatus(`Google Picker failed: ${err?.message || 'Could not launch'}`);
+    } finally {
+      setPickerLoading(false);
     }
   };
 

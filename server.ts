@@ -69,6 +69,8 @@ app.get('/api/profile', (req, res) => {
   try {
     const profile = {
       name: "Henok Abebe T.",
+      email: "henz@hirnarvl.onmicrosoft.com",
+      phone: "+251933310270",
       title: "Veterinary Epidemiologist | One Health Systems & Data Analytics",
       organization: "Hirna Regional Veterinary Laboratory (HRVL)",
       location: "Ethiopia",

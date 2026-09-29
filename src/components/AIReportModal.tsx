@@ -709,7 +709,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                             src="https://lh3.googleusercontent.com/d/1ZDOhhyJOrlX0R8A0rX1bgkc9DJDEhInl"
                             alt="ARVL Official Verification Stamp" 
                             referrerPolicy="no-referrer"
-                            className="w-[110px] h-[110px] sm:w-[124px] sm:h-[124px] object-contain opacity-90 select-none transform rotate-[-4deg] drop-shadow-xs"
+                            className="w-[110px] h-[110px] sm:w-[124px] sm:h-[124px] object-contain opacity-90 select-none transform rotate-[-4deg] mix-blend-multiply dark:mix-blend-screen filter contrast-125"
                             loading="eager"
                           />
                         </div>
@@ -726,9 +726,13 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                         </span>
                         <div className="space-y-0.5 text-slate-800 dark:text-slate-200">
                           <p className="font-bold text-xs">Dr. Henok Abebe T.</p>
-                          <p className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Lead Epidemiologist & Systems Developer</p>
-                          <p className="text-[10px] text-slate-600 dark:text-slate-400">Veterinary Public Health & One Health Systems Analytics</p>
-                          <p className="text-blue-700 dark:text-blue-400 font-medium text-[10px]">Hirna Regional Veterinary Laboratory (HRVL)</p>
+                          <p className="text-[10px] font-mono text-slate-600 dark:text-slate-400">Email: henz@hirnarvl.onmicrosoft.com</p>
+                          <p className="text-[10px] font-mono text-slate-600 dark:text-slate-400">Phone: +251933310270</p>
+                          <div className="pt-1 text-[10px] text-slate-600 dark:text-slate-300 space-y-0.5">
+                            <p className="font-semibold">Lead Epidemiologist & Systems Developer</p>
+                            <p>Veterinary Public Health & One Health Systems Analytics</p>
+                            <p className="text-blue-700 dark:text-blue-400 font-medium">Hirna Regional Veterinary Laboratory (HRVL)</p>
+                          </div>
                         </div>
                       </div>
 
@@ -746,9 +750,13 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                         </span>
                         <div className="space-y-0.5 text-slate-800 dark:text-slate-200 sm:text-right">
                           <p className="font-bold text-xs">Dr. Tsegaye Nagasa</p>
-                          <p className="text-[10px] font-semibold text-slate-700 dark:text-slate-300">Director General / Head of Laboratory</p>
-                          <p className="text-slate-600 dark:text-slate-400 text-[10px]">Hirna Regional Veterinary Laboratory, Oromia</p>
-                          <p className="text-blue-700 dark:text-blue-400 font-mono font-bold pt-0.5 text-[10px]">Status: Verified & Distributed</p>
+                          <p className="text-[10px] font-mono text-slate-600 dark:text-slate-400">Email: tsegayenegese@yahoo.com</p>
+                          <p className="text-[10px] font-mono text-slate-600 dark:text-slate-400">Phone: +251921680983</p>
+                          <div className="pt-1 text-[10px] text-slate-600 dark:text-slate-300 space-y-0.5">
+                            <p className="font-semibold">Director General / Head of Laboratory</p>
+                            <p className="text-slate-600 dark:text-slate-400">Hirna Regional Veterinary Laboratory, Oromia</p>
+                            <p className="text-blue-700 dark:text-blue-400 font-mono font-bold pt-0.5">Status: Verified & Distributed</p>
+                          </div>
                         </div>
                       </div>
 
@@ -759,16 +767,16 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                           <span className="font-mono text-[9px] text-slate-500 dark:text-slate-400 block">Official Signature & Date</span>
                         </div>
 
-                        {/* Official Verification Stamp (HRVL: ~124px, opacity 90%) */}
+                        {/* Official Verification Stamp (HRVL: ~124px, opacity 90%, transparent blend) */}
                         <div 
                           className="absolute -right-2 -bottom-4 pointer-events-none z-10"
                           title="HRVL Official Verification Stamp"
                         >
                           <img 
-                            src="https://lh3.googleusercontent.com/d/13JD8Kn3JGso3LX5sj3Lr0W63eKm37gFr"
+                            src="https://lh3.googleusercontent.com/d/1OJjrNkBatUTBsmxT3-DWlL_BdNU1f0Qe"
                             alt="HRVL Official Verification Stamp" 
                             referrerPolicy="no-referrer"
-                            className="w-[110px] h-[110px] sm:w-[124px] sm:h-[124px] object-contain opacity-90 select-none transform rotate-[-3deg] drop-shadow-xs"
+                            className="w-[110px] h-[110px] sm:w-[124px] sm:h-[124px] object-contain opacity-90 select-none transform rotate-[-3deg] mix-blend-multiply dark:mix-blend-screen filter contrast-125"
                             loading="eager"
                           />
                         </div>

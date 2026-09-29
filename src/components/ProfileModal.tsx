@@ -19,7 +19,9 @@ import {
   Layers,
   ArrowRight,
   ShieldCheck,
-  Stethoscope
+  Stethoscope,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { professionalProfile } from '../data/profile';
@@ -98,6 +100,18 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                     <Award className="w-3.5 h-3.5 opacity-80" />
                     {professionalProfile.experience} Experience
                   </span>
+                  {professionalProfile.phone && (
+                    <a href={`tel:${professionalProfile.phone}`} className="flex items-center gap-1 hover:text-white transition-colors">
+                      <Phone className="w-3.5 h-3.5 opacity-80" />
+                      {professionalProfile.phone}
+                    </a>
+                  )}
+                  {professionalProfile.email && (
+                    <a href={`mailto:${professionalProfile.email}`} className="flex items-center gap-1 hover:text-white transition-colors">
+                      <Mail className="w-3.5 h-3.5 opacity-80" />
+                      {professionalProfile.email}
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

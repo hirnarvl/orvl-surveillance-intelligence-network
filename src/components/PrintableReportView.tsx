@@ -133,7 +133,7 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
     dataSourceLabel: 'HRVL Dashboard Dataset (ADNIS)',
     logoUrl: 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom',
     fallbackLogoUrl: '/hrvl-emblem.png',
-    stampUrl: 'https://lh3.googleusercontent.com/d/13JD8Kn3JGso3LX5sj3Lr0W63eKm37gFr',
+    stampUrl: 'https://lh3.googleusercontent.com/d/1OJjrNkBatUTBsmxT3-DWlL_BdNU1f0Qe',
     colorTheme: 'emerald',
     badgeBg: 'bg-blue-50',
     badgeBorder: 'border-blue-300',
@@ -141,12 +141,16 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
     email: 'hirnarvl@oromiavet.gov.et',
     compiledBy: {
       name: 'Dr. Henok Abebe T.',
+      email: 'henz@hirnarvl.onmicrosoft.com',
+      phone: '+251933310270',
       title: 'Lead Epidemiologist & Systems Developer',
       division: 'Veterinary Public Health & One Health Systems Analytics',
       organization: 'Hirna Regional Veterinary Laboratory (HRVL)'
     },
     approvedBy: {
       name: 'Dr. Tsegaye Nagasa',
+      email: 'tsegayenegese@yahoo.com',
+      phone: '+251921680983',
       title: 'Director General / Head of Laboratory',
       organization: 'Hirna Regional Veterinary Laboratory, Oromia'
     },
@@ -1483,7 +1487,7 @@ Status: Verified & Distributed`}
                       src={labConfig.stampUrl}
                       alt="ARVL Official Verification Stamp" 
                       referrerPolicy="no-referrer"
-                      className="w-[132px] h-[132px] object-contain opacity-90 select-none transform rotate-[-4deg] drop-shadow-xs"
+                      className="w-[132px] h-[132px] object-contain opacity-90 select-none transform rotate-[-4deg] mix-blend-multiply filter contrast-125"
                       loading="eager"
                     />
                   </div>
@@ -1500,9 +1504,17 @@ Status: Verified & Distributed`}
                   </span>
                   <div className="space-y-1">
                     <p className="text-slate-900 font-black text-sm">{labConfig.compiledBy.name}</p>
-                    <p className="text-slate-700 text-xs font-bold mt-0.5">{labConfig.compiledBy.title}</p>
-                    <p className="text-slate-600 text-[11px] font-medium">{labConfig.compiledBy.division}</p>
-                    <p className="text-slate-500 text-[10px] mt-0.5">{labConfig.compiledBy.organization}</p>
+                    {labConfig.compiledBy.email && (
+                      <p className="text-slate-700 text-xs font-mono">Email: {labConfig.compiledBy.email}</p>
+                    )}
+                    {labConfig.compiledBy.phone && (
+                      <p className="text-slate-700 text-xs font-mono">Phone: {labConfig.compiledBy.phone}</p>
+                    )}
+                    <div className="pt-2 text-slate-700 text-xs space-y-0.5">
+                      <p className="font-bold">{labConfig.compiledBy.title}</p>
+                      <p className="text-slate-600 font-medium">{labConfig.compiledBy.division}</p>
+                      <p className="text-slate-500 text-[10px] font-medium">{labConfig.compiledBy.organization}</p>
+                    </div>
                   </div>
                 </div>
 
@@ -1520,9 +1532,17 @@ Status: Verified & Distributed`}
                   </span>
                   <div className="space-y-1 sm:text-right">
                     <p className="text-slate-900 font-black text-sm">{labConfig.approvedBy.name}</p>
-                    <p className="text-slate-700 text-xs font-bold mt-0.5">{labConfig.approvedBy.title}</p>
-                    <p className="text-slate-600 text-[11px] font-medium">{labConfig.approvedBy.organization}</p>
-                    <p className="text-slate-500 text-[10px] mt-0.5 font-mono">Status: Verified & Distributed</p>
+                    {labConfig.approvedBy.email && (
+                      <p className="text-slate-700 text-xs font-mono">Email: {labConfig.approvedBy.email}</p>
+                    )}
+                    {labConfig.approvedBy.phone && (
+                      <p className="text-slate-700 text-xs font-mono">Phone: {labConfig.approvedBy.phone}</p>
+                    )}
+                    <div className="pt-2 text-slate-700 text-xs space-y-0.5">
+                      <p className="font-bold">{labConfig.approvedBy.title}</p>
+                      <p className="text-slate-600 font-medium">{labConfig.approvedBy.organization}</p>
+                      <p className="text-blue-800 font-mono font-bold text-xs pt-1">Status: Verified & Distributed</p>
+                    </div>
                   </div>
                 </div>
 
@@ -1542,7 +1562,7 @@ Status: Verified & Distributed`}
                       src={labConfig.stampUrl}
                       alt="HRVL Official Verification Stamp" 
                       referrerPolicy="no-referrer"
-                      className="w-[132px] h-[132px] object-contain opacity-90 select-none transform rotate-[-3deg] drop-shadow-xs"
+                      className="w-[132px] h-[132px] object-contain opacity-90 select-none transform rotate-[-3deg] mix-blend-multiply filter contrast-125"
                       loading="eager"
                     />
                   </div>

@@ -13,6 +13,8 @@ export interface ProfessionalProfile {
   interests: string[];
   digitalDataTools: string[];
   professionalFocus: string;
+  email?: string;
+  phone?: string;
   links: {
     gravatar: string;
     wordpress: string;
@@ -83,6 +85,8 @@ export const professionalProfile: ProfessionalProfile = {
     "Web-Based Analytics"
   ],
   professionalFocus: "Field Epidemiology → Laboratory Diagnostics → Data → Intelligence → Decision-Making → Public Health Action",
+  email: "henz@hirnarvl.onmicrosoft.com",
+  phone: "+251933310270",
   links: {
     gravatar: "https://henokabebet.link/",
     wordpress: "https://henockabebe.wordpress.com",

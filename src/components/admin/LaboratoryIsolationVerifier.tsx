@@ -285,8 +285,8 @@ export const LaboratoryIsolationVerifier: React.FC<LaboratoryIsolationVerifierPr
       return {
         analystHeader: 'REPORT COMPILED & ANALYZED BY',
         analystName: 'Dr. Henok Abebe T.',
-        analystEmail: 'hirnarvl@oromiavet.gov.et',
-        analystPhone: '+251 25 551 0045',
+        analystEmail: 'henz@hirnarvl.onmicrosoft.com',
+        analystPhone: '+251933310270',
         analystRole: 'Lead Epidemiologist & Systems Developer',
         analystDivision: 'Veterinary Public Health & One Health Systems Analytics',
         analystOrg: 'Hirna Regional Veterinary Laboratory (HRVL)',
@@ -294,8 +294,8 @@ export const LaboratoryIsolationVerifier: React.FC<LaboratoryIsolationVerifierPr
         approverName: 'Dr. Tsegaye Nagasa',
         approverRole: 'Director General / Head of Laboratory',
         approverOrg: 'Hirna Regional Veterinary Laboratory, Oromia',
-        approverEmail: 'director@hirnarvl.gov.et',
-        approverPhone: '+251 25 551 0012',
+        approverEmail: 'tsegayenegese@yahoo.com',
+        approverPhone: '+251921680983',
         approvalStatus: 'Verified & Distributed',
         specCompliant: true
       };

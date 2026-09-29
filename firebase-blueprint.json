@@ -1,16 +1,4 @@
 {
-  "auth": {
-    "providers": {
-      "emailPassword": true,
-      "googleSignIn": {
-        "oAuthBrandDisplayName": "HRVL / ARVL Surveillance",
-        "supportEmail": "hirnarvl@oromiavet.gov.et",
-        "authorizedRedirectUris": [
-          "http://localhost:3000"
-        ]
-      }
-    }
-  },
   "entities": {
     "baselineRecord": {
       "title": "BaselineRecord",
@@ -131,9 +119,9 @@
         "professionalDesignation": { "type": "string" },
         "organization": { "type": "string" },
         "role": { "type": "string" },
-        "roles": { "type": "array", "items": { "type": "string" } },
-        "laboratories": { "type": "array", "items": { "type": "string" } },
-        "permissions": { "type": "array", "items": { "type": "string" } },
+        "roles": { "type": "array" },
+        "laboratories": { "type": "array" },
+        "permissions": { "type": "array" },
         "status": { "type": "string", "enum": ["pending", "approved", "active", "rejected", "suspended"] },
         "accountStatus": { "type": "string", "enum": ["pending", "approved", "active", "rejected", "suspended"] },
         "emailVerified": { "type": "boolean" },
@@ -165,6 +153,66 @@
         "details": { "type": "string" }
       },
       "required": ["actorUserId", "actorName", "action", "timestamp"]
+    },
+    "vaccinationCalendarEntry": {
+      "title": "VaccinationCalendarEntry",
+      "description": "Scheduled or active vaccination campaign in the ARVL or HRVL catchment area",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "laboratoryId": { "type": "string" },
+        "disease": { "type": "string" },
+        "targetSpecies": { "type": "string" },
+        "zone": { "type": "string" },
+        "woreda": { "type": "string" },
+        "targetDoses": { "type": "number" },
+        "administeredDoses": { "type": "number" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["scheduled", "in_progress", "completed", "postponed"] }
+      },
+      "required": ["laboratoryId", "disease", "targetSpecies", "targetDoses", "status"]
+    },
+    "vaccineItem": {
+      "title": "VaccineItem",
+      "description": "Standard vaccine dictionary item with stock tracking and storage protocols",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "disease": { "type": "string" },
+        "targetSpecies": { "type": "array" },
+        "dosage": { "type": "string" },
+        "storageTemperature": { "type": "string" },
+        "manufacturer": { "type": "string" }
+      },
+      "required": ["name", "disease"]
+    },
+    "adnisReport": {
+      "title": "ADNISReport",
+      "description": "Field surveillance report submitted by woreda veterinary officers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "woreda": { "type": "string" },
+        "zone": { "type": "string" },
+        "disease": { "type": "string" },
+        "species": { "type": "string" },
+        "cases": { "type": "number" },
+        "deaths": { "type": "number" }
+      },
+      "required": ["woreda", "zone", "disease"]
+    },
+    "genericDoc": {
+      "title": "GenericDocument",
+      "description": "Generic system configuration or connection test document",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "number" }
+      }
     }
   },
   "firestore": {
@@ -188,17 +236,28 @@
       "schema": { "$ref": "#/entities/baselineRecord" },
       "description": "New and live ongoing surveillance stream"
     },
+    "/adnis_field_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/adnisReport" },
+      "description": "Submitted field reports from woredas"
+    },
+    "/adnis_zero_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/adnisReport" },
+      "description": "Zero disease incident reporting from active surveillance posts"
+    },
     "/personnel/{personnelId}": {
       "schema": { "$ref": "#/entities/personnel" },
       "description": "Veterinary reporters and focal persons extracted from operational records"
     },
     "/metadata/{metaDoc}": {
+      "schema": { "$ref": "#/entities/genericDoc" },
       "description": "Operational dataset versioning, sync timestamps and coverage metrics"
     },
     "/import_batches/{batchId}": {
+      "schema": { "$ref": "#/entities/genericDoc" },
       "description": "Audit trail of historical ADNIS import batches and parsing ledgers"
     },
     "/raw_staging_archive/{stagingId}": {
+      "schema": { "$ref": "#/entities/genericDoc" },
       "description": "Staging and quarantined non-HRVL national records preserved for audit"
     },
     "/surveillanceRecords/{recordId}": {
@@ -210,9 +269,23 @@
       "description": "Outbreak events registered by veterinary epidemiologists"
     },
     "/surveillance/{surveillanceId}": {
+      "schema": { "$ref": "#/entities/surveillanceRecord" },
       "description": "Field disease surveillance records"
     },
+    "/arvl_vaccination_calendar/{calendarId}": {
+      "schema": { "$ref": "#/entities/vaccinationCalendarEntry" },
+      "description": "ARVL regional vaccination campaigns and schedules"
+    },
+    "/arvl_vaccine_dictionary/{dictId}": {
+      "schema": { "$ref": "#/entities/vaccineItem" },
+      "description": "ARVL vaccine formulation dictionary and specifications"
+    },
+    "/arvl_vaccination_audit/{auditId}": {
+      "schema": { "$ref": "#/entities/auditLog" },
+      "description": "Audit trail of vaccination activities and campaign status modifications"
+    },
     "/test/{testId}": {
+      "schema": { "$ref": "#/entities/genericDoc" },
       "description": "Health check and connection verification"
     }
   }

@@ -483,7 +483,7 @@ service cloud.firestore {
     // 19. HEALTH CHECK / CONNECTION VERIFICATION
     // -------------------------------------------------------------------------
     match /test/{testId} {
-      allow read: if isSignedIn() && isApproved();
+      allow read: if true;
       allow write: if isSuperAdmin();
     }
   }

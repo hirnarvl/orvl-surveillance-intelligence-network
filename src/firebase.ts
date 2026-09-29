@@ -1,10 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { 
   getFirestore, 
-  initializeFirestore, 
-  persistentLocalCache, 
-  persistentMultipleTabManager, 
-  memoryLocalCache,
   setLogLevel,
   Firestore 
 } from "firebase/firestore";
@@ -75,26 +71,7 @@ const rawDbId = (firebaseConfigJson && (firebaseConfigJson as { firestoreDatabas
   || "ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac";
 const targetDbId = (rawDbId && rawDbId !== '(default)') ? rawDbId : undefined;
 
-let firestoreInstance: Firestore;
-try {
-  firestoreInstance = initializeFirestore(app, {
-    localCache: persistentLocalCache({
-      tabManager: persistentMultipleTabManager()
-    }),
-    experimentalAutoDetectLongPolling: true
-  }, targetDbId);
-} catch {
-  try {
-    firestoreInstance = initializeFirestore(app, {
-      localCache: memoryLocalCache(),
-      experimentalAutoDetectLongPolling: true
-    }, targetDbId);
-  } catch {
-    firestoreInstance = targetDbId ? getFirestore(app, targetDbId) : getFirestore(app);
-  }
-}
-
-export const db = firestoreInstance;
+export const db: Firestore = targetDbId ? getFirestore(app, targetDbId) : getFirestore(app);
 export const auth = getAuth(app);
 
 // Gracefully handle connection state testing according to standard guidelines
@@ -106,19 +83,27 @@ export async function testFirestoreConnection() {
     const { doc, getDocFromServer } = await import('firebase/firestore');
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    if (
-      errMsg.includes('offline') || 
-      errMsg.includes('auth/network-request-failed') || 
-      errMsg.includes('unavailable') ||
-      errMsg.includes('closing') ||
-      errMsg.includes('hidden') ||
-      errMsg.includes('IndexedDB')
-    ) {
-      // Benign expected offline or backgrounding state in local/preview environments
-      console.info('[Firestore] Operating with offline persistence cache.');
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.error("Please check your Firebase configuration.");
+    } else {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      if (
+        errMsg.includes('offline') || 
+        errMsg.includes('auth/network-request-failed') || 
+        errMsg.includes('unavailable') ||
+        errMsg.includes('closing') ||
+        errMsg.includes('hidden') ||
+        errMsg.includes('IndexedDB')
+      ) {
+        console.info('[Firestore] Operating with offline persistence cache.');
+      }
     }
   }
+}
+
+// Automatically test connection when application boots
+if (typeof window !== 'undefined') {
+  testFirestoreConnection();
 }
 
 export enum OperationType {
