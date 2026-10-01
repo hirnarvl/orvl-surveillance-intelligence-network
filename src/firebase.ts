@@ -55,20 +55,20 @@ const jsonCfg = (firebaseConfigJson as Record<string, string>) || {};
 
 // Canonical Firebase Applet Configuration
 const activeConfig = {
-  apiKey: isValidFirebaseApiKey(jsonCfg.apiKey)
-    ? jsonCfg.apiKey
-    : (isValidFirebaseApiKey(import.meta.env.VITE_FIREBASE_API_KEY) ? (import.meta.env.VITE_FIREBASE_API_KEY as string) : jsonCfg.apiKey || ''),
-  authDomain: jsonCfg.authDomain || (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) || (jsonCfg.projectId ? `${jsonCfg.projectId}.firebaseapp.com` : ''),
-  projectId: jsonCfg.projectId || (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) || '',
-  storageBucket: jsonCfg.storageBucket || (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || (jsonCfg.projectId ? `${jsonCfg.projectId}.firebasestorage.app` : ''),
-  messagingSenderId: jsonCfg.messagingSenderId || (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || '',
-  appId: jsonCfg.appId || (import.meta.env.VITE_FIREBASE_APP_ID as string) || ''
+  ...firebaseConfigJson,
+  apiKey: isValidFirebaseApiKey(firebaseConfigJson.apiKey)
+    ? firebaseConfigJson.apiKey
+    : (import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfigJson.apiKey || ''),
+  authDomain: firebaseConfigJson.authDomain || import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || `${firebaseConfigJson.projectId}.firebaseapp.com`,
+  projectId: firebaseConfigJson.projectId || import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: firebaseConfigJson.storageBucket || import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || `${firebaseConfigJson.projectId}.firebasestorage.app`,
+  messagingSenderId: firebaseConfigJson.messagingSenderId || import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: firebaseConfigJson.appId || import.meta.env.VITE_FIREBASE_APP_ID || ''
 };
 
 const app = !getApps().length ? initializeApp(activeConfig) : getApp();
 
-const rawDbId = (firebaseConfigJson && (firebaseConfigJson as { firestoreDatabaseId?: string }).firestoreDatabaseId) 
-  || "ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac";
+const rawDbId = firebaseConfigJson.firestoreDatabaseId || "ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac";
 
 export const db: Firestore = getFirestore(app, rawDbId);
 export const auth = getAuth(app);
