@@ -3,7 +3,6 @@ import { X, ExternalLink, Globe, BookOpen, GraduationCap, Library, Beaker, Copy,
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { HIRNA_LAB_COORDS } from '../data/woredas';
-import { getApiUrl } from '../utils/api';
 
 interface ExternalResourcesModalProps {
   isOpen: boolean;
@@ -74,7 +73,7 @@ export const ExternalResourcesModal: React.FC<ExternalResourcesModalProps> = ({ 
     },
     {
       name: 'Research4Life Academic Repository',
-      url: getApiUrl('/api/r4l-login'),
+      url: 'https://login.research4life.org/tacari_login/login',
       description: 'Comprehensive peer-reviewed journals and diagnostic scientific literature for health institutions (Institutional Access Auto-Login).',
       logo: 'https://www.research4life.org/wp-content/uploads/2018/10/R4L_logo_RGB.png',
       fallbackIcon: <Library className="w-5 h-5 text-rose-600 dark:text-rose-400" />,
@@ -199,13 +198,13 @@ export const ExternalResourcesModal: React.FC<ExternalResourcesModalProps> = ({ 
 
                 <div className="shrink-0 sm:pt-0 pt-2 flex flex-col gap-2">
                   <a
-                    href={getApiUrl('/api/r4l-login')}
+                    href="https://login.research4life.org/tacari_login/login"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center space-x-1.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap group"
                   >
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Secure Auto-Login</span>
+                    <span>Open Institutional Portal</span>
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </a>
                   <a

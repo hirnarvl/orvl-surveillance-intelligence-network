@@ -6,6 +6,7 @@ import firebaseConfig from './firebase-applet-config.json'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   define: {
     'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(firebaseConfig.apiKey),
     'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(firebaseConfig.authDomain),

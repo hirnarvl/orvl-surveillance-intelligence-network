@@ -69,9 +69,8 @@ const app = !getApps().length ? initializeApp(activeConfig) : getApp();
 
 const rawDbId = (firebaseConfigJson && (firebaseConfigJson as { firestoreDatabaseId?: string }).firestoreDatabaseId) 
   || "ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac";
-const targetDbId = (rawDbId && rawDbId !== '(default)') ? rawDbId : undefined;
 
-export const db: Firestore = targetDbId ? getFirestore(app, targetDbId) : getFirestore(app);
+export const db: Firestore = getFirestore(app, rawDbId);
 export const auth = getAuth(app);
 
 // Gracefully handle connection state testing according to standard guidelines
