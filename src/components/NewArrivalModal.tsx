@@ -8,7 +8,7 @@ import { useLaboratory } from '../contexts/LaboratoryContext';
 interface NewArrivalModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddRecord: (rec: SurveillanceRecord) => void;
+  onAddRecord: (rec: SurveillanceRecord) => boolean | void;
 }
 
 const ARVL_ZONES = [
@@ -192,8 +192,10 @@ export const NewArrivalModal: React.FC<NewArrivalModalProps> = ({
       dataQualityStatus: woredaValidation.status
     };
 
-    onAddRecord(newRec);
-    onClose();
+    const result = onAddRecord(newRec);
+    if (result !== false) {
+      onClose();
+    }
   };
 
   const diseaseOptions = activeModalLab === 'arvl' ? ARVL_DISEASES : HRVL_DISEASES;
@@ -600,8 +602,22 @@ export const NewArrivalModal: React.FC<NewArrivalModalProps> = ({
                 min={0}
                 value={isZeroReport ? 0 : deaths}
                 onChange={e => setDeaths(Number(e.target.value))}
-                className="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-rose-600 focus:outline-none disabled:opacity-50"
+                className={`w-full p-2.5 rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:outline-none disabled:opacity-50 ${
+                  !isZeroReport && deaths > cases
+                    ? 'border-rose-500 text-rose-600 ring-2 ring-rose-500/20'
+                    : 'border-slate-300 dark:border-slate-700 text-rose-600'
+                }`}
               />
+              {!isZeroReport && deaths > cases && (
+                <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold mt-1 flex items-center gap-1">
+                  Fatalities cannot exceed reported cases ({cases}).
+                </p>
+              )}
+              {!isZeroReport && cases > 0 && deaths > 0 && deaths <= cases && (deaths / cases) >= 0.40 && (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-1 flex items-center gap-1">
+                  ⚠️ Unusually high mortality ({((deaths / cases) * 100).toFixed(1)}% CFR) — will be flagged as Critical.
+                </p>
+              )}
             </div>
 
           </div>

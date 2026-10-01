@@ -210,33 +210,7 @@ class VoiceService {
     this.currentText = text;
     this.currentLanguage = language;
 
-    // First attempt server-side TTS audio streaming for natural pronunciation in Amharic, Afan Oromo, and English
-    if (this.audioPlayer) {
-      try {
-        this.isUsingAudioPlayer = true;
-        const sourceFolder = this.labContext === 'arvl' ? ARVL_AUDIO : HRVL_AUDIO;
-        // The TTS API endpoint acts as a proxy for the dynamic source folders
-        const audioSrc = `${sourceFolder}api/tts?lang=${encodeURIComponent(language)}&text=${encodeURIComponent(text.trim())}`;
-        this.audioPlayer.src = audioSrc;
-        this.audioPlayer.playbackRate = this.rate;
-
-        const playPromise = this.audioPlayer.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              this.setState('playing');
-            })
-            .catch((err) => {
-              console.warn('[HRVL VoiceService] Audio play error, falling back to SpeechSynthesis:', err);
-              this.speakWithSpeechSynthesis(text, language, onEnd, onError);
-            });
-        }
-        return;
-      } catch (err) {
-        console.warn('[HRVL VoiceService] Failed to stream server audio, falling back to SpeechSynthesis:', err);
-      }
-    }
-
+    // Use native Web Speech API SpeechSynthesis directly for zero-cost, serverless narration
     this.speakWithSpeechSynthesis(text, language, onEnd, onError);
   }
 

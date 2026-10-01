@@ -11,7 +11,7 @@ import { AccountStatusBanner } from './components/AccountStatusBanner';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Printer, X, ShieldCheck, FileText, Check, Activity, Building2, UserCircle2, Calendar, RotateCcw, Filter } from 'lucide-react';
+import { Printer, X, ShieldCheck, FileText, Check, Activity, Building2, UserCircle2, Calendar, RotateCcw, Filter, AlertTriangle, AlertOctagon } from 'lucide-react';
 import { isRecordInDateRange, formatDateRangeDisplay } from './utils/dateFilter';
 import { Navbar } from './components/Navbar';
 import { KPICards } from './components/KPICards';
@@ -382,29 +382,154 @@ export default function App() {
     };
   }, [isSimulatorRunning, currentLabInfo.shortCode]);
 
-  // Handle adding new arrival record manually or from quick simulator
-  const handleAddLogArrival = (rec: Partial<SurveillanceRecord>) => {
+  // State for real-time surveillance record validation alerts
+  const [validationAlert, setValidationAlert] = useState<{
+    type: 'error' | 'warning' | 'flagged';
+    title: string;
+    message: string;
+    details?: string[];
+  } | null>(null);
+
+  // Auto-dismiss validation toast after 9 seconds
+  useEffect(() => {
+    if (validationAlert) {
+      const timer = setTimeout(() => {
+        setValidationAlert(null);
+      }, 9000);
+      return () => clearTimeout(timer);
+    }
+  }, [validationAlert]);
+
+  // Handle adding new arrival record manually or from quick simulator with robust epidemiological validation
+  const handleAddLogArrival = (rec: Partial<SurveillanceRecord>): boolean => {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // --- STEP 1: VALIDATE REQUIRED FIELDS & FORMATS ---
+    const woredaStr = (rec.woreda || '').trim();
+    if (!woredaStr) {
+      errors.push('Woreda / Administrative district name is required.');
+    }
+
+    const zoneStr = (rec.zone || '').trim();
+    if (!zoneStr) {
+      errors.push('Epidemiological zone classification is required.');
+    }
+
+    const dateStr = (rec.date || '').trim();
+    if (!dateStr) {
+      errors.push('Observation / reporting date is required.');
+    } else {
+      const parsedDate = Date.parse(dateStr);
+      if (isNaN(parsedDate)) {
+        errors.push('Observation date is not a valid calendar date format.');
+      } else {
+        const tomorrow = Date.now() + 24 * 60 * 60 * 1000;
+        if (parsedDate > tomorrow) {
+          errors.push('Observation date cannot be set in the future.');
+        }
+      }
+    }
+
+    const isZero = rec.isZeroReport === true;
+    if (!isZero) {
+      const diseaseStr = (rec.disease || '').trim();
+      if (!diseaseStr || diseaseStr.toLowerCase() === 'none') {
+        errors.push('Target disease classification is required for positive surveillance records.');
+      }
+
+      const speciesStr = (rec.species || '').trim();
+      if (!speciesStr || speciesStr.toLowerCase() === 'none') {
+        errors.push('Affected livestock species is required for positive surveillance records.');
+      }
+    }
+
+    const rawCases = rec.cases;
+    const cases = rawCases !== undefined && rawCases !== null ? Number(rawCases) : NaN;
+    if (isNaN(cases) || cases < 0) {
+      errors.push('Reported cases count must be a non-negative number.');
+    }
+
+    const rawDeaths = rec.deaths;
+    const deaths = rawDeaths !== undefined && rawDeaths !== null ? Number(rawDeaths) : NaN;
+    if (isNaN(deaths) || deaths < 0) {
+      errors.push('Reported fatalities count must be a non-negative number.');
+    }
+
+    // Fundamental Epidemiological Rule: Fatalities cannot exceed reported cases
+    if (!isNaN(cases) && !isNaN(deaths) && deaths > cases) {
+      errors.push(`Epidemiological inconsistency: Fatalities count (${deaths}) cannot exceed reported cases (${cases}).`);
+    }
+
+    // --- STEP 2: CHECK VALIDATION OUTCOME FOR FATAL ERRORS ---
+    if (errors.length > 0) {
+      console.warn('[Surveillance Validation] Record rejected before saving to Firestore:', errors, rec);
+      setValidationAlert({
+        type: 'error',
+        title: 'Surveillance Validation Failed — Record Not Saved',
+        message: 'The record was rejected and NOT committed to Cloud Firestore due to missing required fields or logical discrepancies.',
+        details: errors
+      });
+      return false;
+    }
+
+    // --- STEP 3: MORTALITY RATE (CFR) EVALUATION & FLAGGING ---
+    const effectiveCases = isZero ? 0 : cases;
+    const effectiveDeaths = isZero ? 0 : deaths;
+
+    let isHighMortality = false;
+    let cfr = 0;
+    if (!isZero && effectiveCases > 0 && effectiveDeaths >= 0) {
+      cfr = Number(((effectiveDeaths / effectiveCases) * 100).toFixed(1));
+      // Flag unusually high mortality: CFR >= 40% OR (deaths >= 5 and CFR >= 25%)
+      if (cfr >= 40 || (effectiveDeaths >= 5 && cfr >= 25)) {
+        isHighMortality = true;
+        warnings.push(`Unusually high Case Fatality Rate (CFR) detected: ${cfr}% (${effectiveDeaths} deaths / ${effectiveCases} cases).`);
+      }
+    }
+
+    let effectiveRisk = rec.risk || 'High';
+    let dataQualityStatus = rec.dataQualityStatus || 'VERIFIED_OFFICIAL';
+    let comment = (rec.comment || 'Field record added manually').trim();
+
+    if (isHighMortality) {
+      effectiveRisk = 'Critical';
+      dataQualityStatus = 'FLAGGED_HIGH_MORTALITY';
+      const alertTag = `[EPIDEMIOLOGICAL ALERT: Unusually high mortality (CFR ${cfr}% - ${effectiveDeaths}/${effectiveCases} deaths). Prioritized for supervisory investigation.]`;
+      comment = comment ? `${comment} ${alertTag}` : alertTag;
+
+      setValidationAlert({
+        type: 'flagged',
+        title: '⚠️ Unusually High Mortality Rate Flagged',
+        message: `High Case Fatality Rate (${cfr}%) detected. The record has been elevated to 'Critical' risk, flagged in Firestore, and queued for supervisory verification.`,
+        details: warnings
+      });
+    } else {
+      setValidationAlert(null);
+    }
+
+    // --- STEP 4: PERSIST VALIDATED & FLAGGED RECORD TO FIRESTORE ---
     const fullRec: SurveillanceRecord = {
       id: rec.id || `SR-${Date.now()}`,
       laboratoryId: rec.laboratoryId || (selectedLab === 'arvl' ? 'arvl' : 'hrvl'),
       laboratoryName: rec.laboratoryName || (selectedLab === 'arvl' ? 'Asela Regional Veterinary Laboratory' : 'Hirna Regional Veterinary Laboratory'),
       region: rec.region || 'Oromia',
-      date: rec.date || new Date().toISOString().split('T')[0],
-      timestamp: rec.timestamp || Date.now(),
-      woreda: rec.woreda || 'Haramaya',
-      zone: rec.zone || 'E/H',
+      date: dateStr,
+      timestamp: rec.timestamp || (dateStr ? new Date(dateStr).getTime() : Date.now()),
+      woreda: woredaStr,
+      zone: zoneStr,
       lat: rec.lat || 9.4123,
       lng: rec.lng || 42.0123,
-      disease: rec.disease || 'Foot-and-Mouth Disease (FMD)',
-      species: rec.species || 'Cattle',
-      cases: rec.cases !== undefined ? rec.cases : 10,
-      deaths: rec.deaths !== undefined ? rec.deaths : 1,
-      risk: rec.risk || 'High',
-      comment: rec.comment || 'Field record added manually',
-      reporter: rec.reporter || 'Vet Officer',
+      disease: isZero ? 'None (Zero Reporting)' : (rec.disease || 'Foot-and-Mouth Disease (FMD)'),
+      species: isZero ? 'None' : (rec.species || 'Cattle'),
+      cases: effectiveCases,
+      deaths: effectiveDeaths,
+      risk: isZero ? 'Low' : effectiveRisk,
+      comment,
+      reporter: (rec.reporter || 'Vet Officer').trim(),
       phone: rec.phone,
-      isZeroReport: rec.isZeroReport || false,
-      dataQualityStatus: rec.dataQualityStatus || 'VERIFIED_OFFICIAL'
+      isZeroReport: isZero,
+      dataQualityStatus
     };
 
     setRecords(prev => [fullRec, ...prev]);
@@ -422,6 +547,8 @@ export default function App() {
       }
       return ds;
     }));
+
+    return true;
   };
 
   // Handle Excel Batch Import
@@ -565,6 +692,61 @@ export default function App() {
         : 'bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100'
     }`}>
       
+      {/* Real-time Surveillance Record Validation Alert Toast */}
+      <AnimatePresence>
+        {validationAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className={`fixed top-4 right-4 z-[9999] max-w-md w-[calc(100vw-2rem)] sm:w-auto p-4 rounded-2xl shadow-2xl border backdrop-blur-md ${
+              validationAlert.type === 'error'
+                ? 'bg-rose-950/95 border-rose-500 text-rose-100 shadow-rose-900/40'
+                : 'bg-amber-950/95 border-amber-500 text-amber-100 shadow-amber-900/40'
+            }`}
+            role="alert"
+          >
+            <div className="flex items-start gap-3">
+              <div className={`p-2 rounded-xl shrink-0 ${
+                validationAlert.type === 'error' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
+              }`}>
+                {validationAlert.type === 'error' ? (
+                  <AlertOctagon className="w-5 h-5" />
+                ) : (
+                  <AlertTriangle className="w-5 h-5" />
+                )}
+              </div>
+              <div className="flex-1 text-xs">
+                <div className="font-bold text-sm tracking-tight mb-1 text-white">
+                  {validationAlert.title}
+                </div>
+                <p className="opacity-90 leading-relaxed mb-2">
+                  {validationAlert.message}
+                </p>
+                {validationAlert.details && validationAlert.details.length > 0 && (
+                  <ul className="space-y-1 bg-black/30 p-2.5 rounded-lg border border-white/10 font-mono text-[11px]">
+                    {validationAlert.details.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className={validationAlert.type === 'error' ? 'text-rose-400 font-bold' : 'text-amber-400 font-bold'}>•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <button
+                onClick={() => setValidationAlert(null)}
+                className="text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
+                aria-label="Dismiss notification"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Left Vertical Navigation Bar */}
       <div className={isPrintFriendlyMode ? 'print:hidden' : 'shrink-0'}>
         <Navbar

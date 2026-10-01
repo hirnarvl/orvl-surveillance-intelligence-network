@@ -71,8 +71,8 @@ export function subscribeToFirestoreRecords(
       ? [where('laboratoryId', 'in', [normalizedLab, normalizedLab.toUpperCase()])]
       : [];
 
-    // 1. Baseline subscription (scoped by laboratoryId)
-    const baselineQuery = query(collection(db, BASELINE_COLLECTION), ...labFilter, limit(2500));
+    // 1. Baseline subscription (scoped by laboratoryId with conservative limit for free quota)
+    const baselineQuery = query(collection(db, BASELINE_COLLECTION), ...labFilter, limit(500));
     const unsubBaseline = onSnapshot(
       baselineQuery,
       { includeMetadataChanges: true },
@@ -84,7 +84,7 @@ export function subscribeToFirestoreRecords(
     );
 
     // 2. Current subscription (scoped by laboratoryId)
-    const currentQuery = query(collection(db, CURRENT_COLLECTION), ...labFilter, limit(1000));
+    const currentQuery = query(collection(db, CURRENT_COLLECTION), ...labFilter, limit(300));
     const unsubCurrent = onSnapshot(
       currentQuery,
       { includeMetadataChanges: true },
@@ -96,7 +96,7 @@ export function subscribeToFirestoreRecords(
     );
 
     // 3. Legacy fallback subscription (scoped by laboratoryId)
-    const legacyQuery = query(collection(db, LEGACY_COLLECTION), ...labFilter, limit(1000));
+    const legacyQuery = query(collection(db, LEGACY_COLLECTION), ...labFilter, limit(200));
     const unsubLegacy = onSnapshot(
       legacyQuery,
       { includeMetadataChanges: true },
