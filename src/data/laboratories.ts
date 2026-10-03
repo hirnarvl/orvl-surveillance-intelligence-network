@@ -1,5 +1,11 @@
 export type LaboratoryId = 'all' | 'hrvl' | 'arvl' | string;
 
+export interface LaboratoryMultilingualNames {
+  en: string;
+  am: string;
+  om: string;
+}
+
 export interface LaboratoryInfo {
   id: string;
   code: string;
@@ -7,6 +13,7 @@ export interface LaboratoryInfo {
   name: string;
   fullName: string;
   shortName: string;
+  names: LaboratoryMultilingualNames;
   location: string;
   region: string;
   zones: string[];
@@ -34,14 +41,72 @@ export interface LaboratoryInfo {
   badgeText: string;
 }
 
+/**
+ * Authoritative Single Source of Truth for Official Laboratory Names
+ * Preserves exact casing, spacing, and institutional designations across English, Amharic, and Afan Oromo.
+ */
+export const OFFICIAL_LABORATORY_NAMES: Record<'hrvl' | 'arvl', {
+  code: 'HRVL' | 'ARVL';
+  shortCode: 'HRVL' | 'ARVL';
+  names: LaboratoryMultilingualNames;
+  en: string;
+  am: string;
+  om: string;
+}> = {
+  hrvl: {
+    code: 'HRVL',
+    shortCode: 'HRVL',
+    names: {
+      en: 'Hirna Regional Veterinary Laboratory',
+      am: 'የሂርና ቀጠና እንስሳት ጤና ላቦራቶሪ',
+      om: 'Laboratoorii Eegumsaa faayaa beeylada G/G HIRNAA',
+    },
+    en: 'Hirna Regional Veterinary Laboratory',
+    am: 'የሂርና ቀጠና እንስሳት ጤና ላቦራቶሪ',
+    om: 'Laboratoorii Eegumsaa faayaa beeylada G/G HIRNAA',
+  },
+  arvl: {
+    code: 'ARVL',
+    shortCode: 'ARVL',
+    names: {
+      en: 'Asella Regional Veterinary Laboratory',
+      am: 'የአሰላ ቀጠና እንስሳት ጤና ላቦራቶሪ',
+      om: 'Laboratoorii Eegumsaa faayaa beeylada G/G ASELA',
+    },
+    en: 'Asella Regional Veterinary Laboratory',
+    am: 'የአሰላ ቀጠና እንስሳት ጤና ላቦራቶሪ',
+    om: 'Laboratoorii Eegumsaa faayaa beeylada G/G ASELA',
+  }
+};
+
+/**
+ * Helper to retrieve the official laboratory name in the active locale.
+ */
+export function getOfficialLabName(labId: string = 'hrvl', locale: string = 'en'): string {
+  const normalizedId = (labId || '').toLowerCase().trim();
+  if (normalizedId === 'all') {
+    if (locale === 'am') return PLATFORM_ALL_LABS_INFO.names.am;
+    if (locale === 'om') return PLATFORM_ALL_LABS_INFO.names.om;
+    return PLATFORM_ALL_LABS_INFO.names.en;
+  }
+  const lab = normalizedId === 'arvl' 
+    ? OFFICIAL_LABORATORY_NAMES.arvl 
+    : OFFICIAL_LABORATORY_NAMES.hrvl;
+
+  if (locale === 'am') return lab.names.am;
+  if (locale === 'om') return lab.names.om;
+  return lab.names.en;
+}
+
 export const LABORATORIES_REGISTRY: Record<string, LaboratoryInfo> = {
   hrvl: {
     id: 'hrvl',
     code: 'HRVL-ET',
     shortCode: 'HRVL',
-    name: 'Hirna Regional Veterinary Laboratory',
-    fullName: 'Hirna Regional Veterinary Diagnostic Laboratory',
+    name: OFFICIAL_LABORATORY_NAMES.hrvl.en,
+    fullName: OFFICIAL_LABORATORY_NAMES.hrvl.en,
     shortName: 'HRVL (Hirna)',
+    names: OFFICIAL_LABORATORY_NAMES.hrvl.names,
     location: 'Hirna, West Hararghe Zone, Oromia Regional State, Ethiopia',
     region: 'Oromia',
     zones: ['East Hararghe (E/H)', 'West Hararghe (W/H)'],
@@ -79,9 +144,10 @@ export const LABORATORIES_REGISTRY: Record<string, LaboratoryInfo> = {
     id: 'arvl',
     code: 'ARVL-ET',
     shortCode: 'ARVL',
-    name: 'Asela Regional Veterinary Laboratory',
-    fullName: 'Asela Regional Veterinary Laboratory',
-    shortName: 'ARVL / Asela RVL',
+    name: OFFICIAL_LABORATORY_NAMES.arvl.en,
+    fullName: OFFICIAL_LABORATORY_NAMES.arvl.en,
+    shortName: 'ARVL (Asella)',
+    names: OFFICIAL_LABORATORY_NAMES.arvl.names,
     location: 'Asela (Assela), Arsi Zone, Oromia Regional State, Ethiopia',
     region: 'Oromia',
     zones: [
@@ -136,6 +202,11 @@ export const PLATFORM_ALL_LABS_INFO: LaboratoryInfo = {
   name: 'ORVL Surveillance Intelligence Network',
   fullName: 'Oromia Regional Veterinary Laboratory Surveillance Intelligence Network',
   shortName: 'ORVL Surveillance Intelligence Network',
+  names: {
+    en: 'ORVL Surveillance Intelligence Network',
+    am: 'የኦሮሚያ ቀጠናዊ የእንስሳት ላቦራቶሪ የበሽታዎች ቅኝትና የመረጃ መረብ',
+    om: 'Netwoorkii Qorannoo fi Odeeffannoo Dhibee Beeyladaa Naannoo Oromiyaa',
+  },
   location: 'Oromia Regional State & Participating Regional Veterinary Laboratories Network',
   region: 'Oromia & Regional Network',
   zones: [

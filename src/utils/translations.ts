@@ -5,6 +5,8 @@ export interface Translations {
   title: string;
   badge: string;
   subtitle: string;
+  labHrvlName: string;
+  labArvlName: string;
   importedDataRange: string;
   offlineCacheActive: string;
   cachedLocally: string;
@@ -227,6 +229,8 @@ export const translations: Record<Locale, Translations> = {
     title: 'ORVL Surveillance Intelligence Network',
     badge: 'ORVL Intelligence Network',
     subtitle: 'Oromia Regional Veterinary Laboratory Surveillance Intelligence Network',
+    labHrvlName: 'Hirna Regional Veterinary Laboratory',
+    labArvlName: 'Asella Regional Veterinary Laboratory',
     importedDataRange: 'Imported Data Range:',
     offlineCacheActive: 'Offline Cache Active',
     cachedLocally: 'Cached Locally',
@@ -430,6 +434,8 @@ export const translations: Record<Locale, Translations> = {
     title: 'ORVL Surveillance Intelligence Network',
     badge: 'Netwoorkii ORVL',
     subtitle: 'Netwoorkii Qorannoo fi Odeeffannoo Dhibee Beeyladaa Naannoo Oromiyaa',
+    labHrvlName: 'Laboratoorii Eegumsaa faayaa beeylada G/G HIRNAA',
+    labArvlName: 'Laboratoorii Eegumsaa faayaa beeylada G/G ASELA',
     importedDataRange: 'Daangaa Yeroo Daataa:',
     offlineCacheActive: 'Kuusaa Toora-Malee (Active)',
     cachedLocally: 'Mootora Lokaaliitti Kuusameera',
@@ -633,6 +639,8 @@ export const translations: Record<Locale, Translations> = {
     title: 'ORVL Surveillance Intelligence Network',
     badge: 'የORVL ኔትወርክ',
     subtitle: 'የኦሮሚያ ቀጠናዊ የእንስሳት ላቦራቶሪ የበሽታዎች ቅኝትና የመረጃ መረብ',
+    labHrvlName: 'የሂርና ቀጠና እንስሳት ጤና ላቦራቶሪ',
+    labArvlName: 'የአሰላ ቀጠና እንስሳት ጤና ላቦራቶሪ',
     importedDataRange: 'የመረጃ ክልል:',
     offlineCacheActive: 'ኢንተርኔት በማይኖርበት ጊዜ ይሰራል (Offline)',
     cachedLocally: 'በመሳሪያው ላይ ተቀምጧል',

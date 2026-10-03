@@ -282,7 +282,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
     timeStyle: 'short' 
   });
 
-  const labName = isArvl ? 'Asela Regional Veterinary Laboratory (ARVL)' : 'Hirna Regional Veterinary Laboratory (HRVL)';
+  const labName = isArvl ? 'Asella Regional Veterinary Laboratory (ARVL)' : 'Hirna Regional Veterinary Laboratory (HRVL)';
   const labShort = isArvl ? 'ARVL' : 'HRVL';
 
   const provenanceMetadata: DataProvenanceMetadata = {
@@ -299,7 +299,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
       dateRange: filters.dateFrom && filters.dateTo ? `${filters.dateFrom} to ${filters.dateTo}` : undefined
     } : undefined,
     geographicCoverage: isArvl 
-      ? '122 Target Operational Woredas across Central-Eastern Oromia (Arsi, West Arsi, Bale, East Bale, Shewa Zones), Ethiopia'
+      ? '112 Target Operational Units across Central-Eastern Oromia (Arsi, West Arsi, Bale, East Bale, Shewa Zones), Ethiopia'
       : '36 Target Woredas (21 East Hararghe, 15 West Hararghe), Oromia Regional State, Ethiopia',
     dataRefreshStatus: isOnline ? 'Live Local & Cloud Verified Telemetry' : 'Local Offline Cached Telemetry',
     isFilteredView: isFiltered && useFilteredData
@@ -383,7 +383,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
         executiveSummary: activeRecords.length === 0
           ? 'No surveillance records were returned under the currently selected query/filter criteria. Please broaden filter parameters.'
           : isArvl
-            ? `During the current reporting period (${reportingPeriod}), the Asela Regional Veterinary Laboratory (ARVL) coordinated surveillance across 122 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases} cases, ${totalDeaths} fatalities). [CONFIRMED DATA]: ARVL diagnostic assays confirmed ${confirmedInvs.length} active outbreak foci with ${positiveLabResults} positive diagnostic tests. Overall woreda zero-reporting compliance stands at ${complianceRate}%.`
+            ? `During the current reporting period (${reportingPeriod}), the Asella Regional Veterinary Laboratory (ARVL) coordinated surveillance across 112 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases} cases, ${totalDeaths} fatalities). [CONFIRMED DATA]: ARVL diagnostic assays confirmed ${confirmedInvs.length} active outbreak foci with ${positiveLabResults} positive diagnostic tests. Overall woreda zero-reporting compliance stands at ${complianceRate}%.`
             : `During the current reporting period (${reportingPeriod}), the Hirna Regional Veterinary Laboratory (HRVL) coordinated surveillance across operational woredas in East and West Hararghe. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases} cases, ${totalDeaths} fatalities). [CONFIRMED DATA]: HRVL diagnostic assays confirmed ${confirmedInvs.length} active outbreak foci with ${positiveLabResults} positive diagnostic tests. Overall woreda zero-reporting compliance stands at ${complianceRate}%.`,
         outbreakStatusAnalysis: isArvl
           ? `Priority transmission clusters involve Foot-and-Mouth Disease (FMD) along transit corridors (Asella, Tiyo, Adama), Peste des Petits Ruminants (PPR) in pastoral small ruminants, and localized Anthrax outbreaks in Robe and Dodola requiring strict carcass biosafety protocols.`
@@ -392,7 +392,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
           ? `Cattle represent 58% of clinical morbidity volume, with high dairy cluster susceptibility in Asella, Tiyo, and Adama. Small ruminants exhibit elevated mortality during acute PPR episodes in pastoral woredas of West Arsi and Bale. Poultry systems demonstrate seasonal Newcastle Disease mortality in rural backyard holdings.`
           : `Cattle represent ${Math.round((totalCases * 0.58) / (totalCases || 1)) * 100 || 60}% of clinical morbidity volume, while small ruminants suffer elevated mortality during acute PPR episodes. Poultry systems demonstrate seasonal Newcastle Disease mortality in rural backyard holdings.`,
         zonalComplianceSummary: isArvl
-          ? `Across the 122 operational units under Asela Regional Veterinary Laboratory (ARVL) jurisdiction across Central-Eastern Oromia, reporting compliance averages ${complianceRate}%. ${zoneCompliance.map(zc => `${zc.zone}: ${zc.compliance}% (${zc.woredaCount} units)`).join(', ')}.`
+          ? `Across the 112 operational units under Asella Regional Veterinary Laboratory (ARVL) jurisdiction across Central-Eastern Oromia, reporting compliance averages ${complianceRate}%. ${zoneCompliance.map(zc => `${zc.zone}: ${zc.compliance}% (${zc.woredaCount} units)`).join(', ')}.`
           : `East Hararghe (21 Woredas) maintained ${zoneCompliance.find(z => z.zone.includes('East'))?.compliance || 68}% average reporting compliance. West Hararghe (15 Woredas) recorded ${zoneCompliance.find(z => z.zone.includes('West'))?.compliance || 70}% compliance, with high fidelity from Chiro, Habro, and Daro Lebu.`,
         highRiskWoredas: isArvl 
           ? ['Asella Town', 'Tiyo', 'Dodola', 'Robe', 'Adama', 'Lome']
@@ -664,7 +664,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                           <div className="pt-1 text-[10px] text-slate-600 dark:text-slate-300 space-y-0.5">
                             <p className="font-semibold">ARVL Epi Surveillance Team Lead Epidemiologist & Admin of ARVL</p>
                             <p>Regional Epizootiological Intelligence & Disease Analytics Dashboard</p>
-                            <p className="text-emerald-700 dark:text-emerald-400 font-medium">Asela Regional Veterinary Laboratory (ARVL)</p>
+                            <p className="text-emerald-700 dark:text-emerald-400 font-medium">Asella Regional Veterinary Laboratory (ARVL)</p>
                           </div>
                         </div>
                       </div>
@@ -687,7 +687,7 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
                           <p className="text-[10px] font-mono text-slate-600 dark:text-slate-400">Phone: +251911748478</p>
                           <div className="pt-1 text-[10px] text-slate-600 dark:text-slate-300 space-y-0.5">
                             <p className="font-semibold">Head of Laboratory</p>
-                            <p className="text-slate-600 dark:text-slate-400">Asela Regional Veterinary Laboratory, Oromia</p>
+                            <p className="text-slate-600 dark:text-slate-400">Asella Regional Veterinary Laboratory, Oromia</p>
                             <p className="text-emerald-700 dark:text-emerald-400 font-mono font-bold pt-0.5">Status: Verified & Distributed</p>
                           </div>
                         </div>

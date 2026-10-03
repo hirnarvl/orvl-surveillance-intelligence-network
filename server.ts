@@ -284,10 +284,25 @@ app.post('/api/generate-narrative', async (req, res) => {
   } = req.body || {};
   
   const isArvl = laboratoryId === 'arvl';
-  const labName = isArvl ? 'Asela Regional Veterinary Laboratory (ARVL)' : 'Hirna Regional Veterinary Laboratory (HRVL)';
+  const officialLabNames = {
+    hrvl: {
+      en: 'Hirna Regional Veterinary Laboratory',
+      am: 'የሂርና ቀጠና እንስሳት ጤና ላቦራቶሪ',
+      om: 'Laboratoorii Eegumsaa faayaa beeylada G/G HIRNAA'
+    },
+    arvl: {
+      en: 'Asella Regional Veterinary Laboratory',
+      am: 'የአሰላ ቀጠና እንስሳት ጤና ላቦራቶሪ',
+      om: 'Laboratoorii Eegumsaa faayaa beeylada G/G ASELA'
+    }
+  };
+
+  const currentLabConfig = isArvl ? officialLabNames.arvl : officialLabNames.hrvl;
+  const officialLabName = locale === 'am' ? currentLabConfig.am : (locale === 'om' ? currentLabConfig.om : currentLabConfig.en);
+  const labName = isArvl ? 'Asella Regional Veterinary Laboratory (ARVL)' : 'Hirna Regional Veterinary Laboratory (HRVL)';
   const labShort = isArvl ? 'ARVL' : 'HRVL';
   const labGeo = isArvl 
-    ? '122 Target Operational Woredas across Central-Eastern Oromia (Arsi, West Arsi, Bale, East Bale, Shewa Zones), Ethiopia'
+    ? '112 Target Operational Units across Central-Eastern Oromia (Arsi, West Arsi, Bale, East Bale, Shewa Zones), Ethiopia'
     : '36 Target Woredas (21 East Hararghe, 15 West Hararghe), Oromia Regional State, Ethiopia';
   const defaultHighRisk = isArvl
     ? ['Asella Town', 'Tiyo', 'Dodola', 'Robe', 'Adama', 'Lome']
@@ -335,7 +350,7 @@ app.post('/api/generate-narrative', async (req, res) => {
     let t_exec = effectiveRecordsAnalyzed === 0
       ? `No active epidemiological records were returned under the currently selected query/filter criteria (${JSON.stringify(activeFilters)}). Please adjust filter parameters to view broader zonal or historical surveillance records.`
       : isArvl
-      ? `During the reporting period (${effectivePeriod}), the Asela Regional Veterinary Laboratory (ARVL) coordinated disease surveillance across 122 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${effectiveRecordsAnalyzed} field surveillance records were analyzed (${totalCases} recorded cases, ${totalDeaths} animal fatalities). Active field surveillance tracked ${effectiveOutbreaksCount} priority outbreak centers, while field response units conducted ${effectiveMissionsCount} active investigations. Woreda zero-reporting compliance currently averages ${complianceRate}%.`
+      ? `During the reporting period (${effectivePeriod}), the Asella Regional Veterinary Laboratory (ARVL) coordinated disease surveillance across 112 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${effectiveRecordsAnalyzed} field surveillance records were analyzed (${totalCases} recorded cases, ${totalDeaths} animal fatalities). Active field surveillance tracked ${effectiveOutbreaksCount} priority outbreak centers, while field response units conducted ${effectiveMissionsCount} active investigations. Woreda zero-reporting compliance currently averages ${complianceRate}%.`
       : `During the reporting period (${effectivePeriod}), the Hirna Regional Veterinary Laboratory (HRVL) coordinated surveillance across operational woredas in East and West Hararghe. A total of ${effectiveRecordsAnalyzed} field surveillance records were analyzed (${totalCases} recorded cases, ${totalDeaths} animal fatalities). Active field surveillance tracked ${effectiveOutbreaksCount} priority outbreak centers, while field response units conducted ${effectiveMissionsCount} active investigations. Woreda zero-reporting compliance currently averages ${complianceRate}%.`;
     
     let t_status = isArvl
@@ -347,7 +362,7 @@ app.post('/api/generate-narrative', async (req, res) => {
       : `Cattle represent the highest total case volume (${totalCases > 300 ? '58%' : '42%'}), with elevated mortality in small ruminants (Goats & Sheep) impacted by respiratory disease complexes and PPR. Poultry flocks exhibit acute Newcastle Disease events in backyard production settings.`;
     
     let t_zonal = isArvl
-      ? `Across the 122 operational units under Asela Regional Veterinary Laboratory (ARVL) jurisdiction across Central-Eastern Oromia, reporting compliance averages ${complianceRate}%. Arsi Zone recorded strong compliance at 70%, East Bale reached 79%, Bishoftu City achieved 92%, and Sheger City maintained 73% with ongoing field expansion and mobile telemetry support across West Arsi, Bale, and Shewa.`
+      ? `Across the 112 operational units under Asella Regional Veterinary Laboratory (ARVL) jurisdiction across Central-Eastern Oromia, reporting compliance averages ${complianceRate}%. Arsi Zone recorded strong compliance at 70%, East Bale reached 79%, Bishoftu City achieved 92%, and Sheger City maintained 73% with ongoing field expansion and mobile telemetry support across West Arsi, Bale, and Shewa.`
       : `East Hararghe (21 Woredas) maintained 68% average reporting compliance. West Hararghe (15 Woredas) recorded 70% compliance, with high fidelity from Chiro, Habro, and Daro Lebu.`;
     
     let t_recs = isArvl ? [
@@ -355,7 +370,7 @@ app.post('/api/generate-narrative', async (req, res) => {
       'Establishment of mobile veterinary checkpoints along primary central transit highways and Adama corridors',
       'Enhanced weekly zero-reporting compliance enforcement in pastoral woredas of West Arsi, Bale and East Bale',
       'Distribution of rapid diagnostic sampling kits for suspected Anthrax mortalities and CBPP surveillance across high-risk herds',
-      'Maintain zero-reporting compliance monitoring across all 122 ARVL operational units'
+      'Maintain zero-reporting compliance monitoring across all 112 ARVL operational units'
     ] : [
       'Immediate ring vaccination (10km radius) around laboratory-confirmed FMD and PPR foci in Haramaya and Dadar border kebeles',
       'Establishment of mobile veterinary checkpoints along primary transit corridors and border entry points',
@@ -369,14 +384,14 @@ app.post('/api/generate-narrative', async (req, res) => {
       t_exec = effectiveRecordsAnalyzed === 0
         ? 'በተመረጠው የማጣሪያ መስፈርት መሰረት ምንም ንቁ የስለላ መዝገቦች አልተገኙም።'
         : isArvl
-        ? `በሪፖርት ጊዜ ውስጥ (${effectivePeriod})፣ ${labName} ${effectiveRecordsAnalyzed} የስለላ መዝገቦችን በመተንተን ${totalCases} የእንስሳት ጉዳዮች እና ${totalDeaths} ሞት መዝግቧል። ንቁ የመስክ ቁጥጥር ${effectiveOutbreaksCount} የወረርሽኝ ማዕከላትን እና ${effectiveMissionsCount} የመስክ ምርመራዎችን ለይቷል። አጠቃላይ የሪፖርት አፈጻጸም ${complianceRate}% ነው።`
-        : `በሪፖርት ጊዜ ውስጥ (${effectivePeriod})፣ ${labName} ${effectiveRecordsAnalyzed} የስለላ መዝገቦችን በመተንተን ${totalCases} የእንስሳት ጉዳዮች እና ${totalDeaths} ሞት መዝግቧል። ንቁ የመስክ ቁጥጥር ${effectiveOutbreaksCount} የወረርሽኝ ማዕከላትን እና ${effectiveMissionsCount} የመስክ ምርመራዎችን ለይቷል።`;
+        ? `በሪፖርት ጊዜ ውስጥ (${effectivePeriod})፣ ${officialLabNames.arvl.am} (ARVL) ${effectiveRecordsAnalyzed} የስለላ መዝገቦችን በመተንተን ${totalCases} የእንስሳት ጉዳዮች እና ${totalDeaths} ሞት መዝግቧል። ንቁ የመስክ ቁጥጥር ${effectiveOutbreaksCount} የወረርሽኝ ማዕከላትን እና ${effectiveMissionsCount} የመስክ ምርመራዎችን ለይቷል። አጠቃላይ የሪፖርት አፈጻጸም ${complianceRate}% ነው።`
+        : `በሪፖርት ጊዜ ውስጥ (${effectivePeriod})፣ ${officialLabNames.hrvl.am} (HRVL) ${effectiveRecordsAnalyzed} የስለላ መዝገቦችን በመተንተን ${totalCases} የእንስሳት ጉዳዮች እና ${totalDeaths} ሞት መዝግቧል። ንቁ የመስክ ቁጥጥር ${effectiveOutbreaksCount} የወረርሽኝ ማዕከላትን እና ${effectiveMissionsCount} የመስክ ምርመራዎችን ለይቷል።`;
       t_status = isArvl
         ? `በዋና ዋና የአርሲ፣ ምዕራብ አርሲ እና ባሌ መስመሮች ላይ የእግር እና የአፍ በሽታ (FMD)፣ የትንሽ እንስሳት ህዝቦችን የሚያጠቃ PPR፣ እና አስቸኳይ ምርመራ የሚፈልጉ የአንትራክስ ጥርጣሬዎችን ጨምሮ ቅድሚያ የሚሰጣቸው የበሽታ ስርጭቶች አሉ።`
         : `በዋና ዋና የንግድ መስመሮች ላይ የእግር እና የአፍ በሽታ (FMD)፣ የትንሽ እንስሳት ህዝቦችን የሚያጠቃ PPR፣ እና አስቸኳይ ምርመራ የሚፈልጉ አልፎ አልፎ የአንትራክስ ጥርጣሬዎችን ጨምሮ ቅድሚያ የሚሰጣቸው የበሽታ ስርጭቶች አሉ።`;
       t_species = `ከብቶች ከፍተኛውን አጠቃላይ የጉዳይ መጠን ይይዛሉ፣ በትንንሽ እንስሳት ላይ በPPR ምክንያት የሞት መጠን ጨምሯል።`;
       t_zonal = isArvl 
-        ? `በአሰላ ክልላዊ የእንስሳት ህክምና ላብራቶሪ (ARVL) ስር ባሉ 122 ኦፕሬሽናል ክፍሎች ውስጥ የዜሮ-ሪፖርት አፈጻጸም በአማካይ ${complianceRate}% ነው። የአርሲ፣ ምዕራብ አርሲ፣ ባሌ፣ ምስራቅ ባሌ እና ሸዋ ዞን ወረዳዎች ሳምንታዊ የሪፖርት አፈጻጸማቸውን እያጠናከሩ ይገኛሉ።` 
+        ? `በ${officialLabNames.arvl.am} (ARVL) ስር ባሉ 112 ኦፕሬሽናል ክፍሎች ውስጥ የዜሮ-ሪፖርት አፈጻጸም በአማካይ ${complianceRate}% ነው። የአርሲ፣ ምዕራብ አርሲ፣ ባሌ፣ ምስራቅ ባሌ እና ሸዋ ዞን ወረዳዎች ሳምንታዊ የሪፖርት አፈጻጸማቸውን እያጠናከሩ ይገኛሉ።` 
         : `የምስራቅ ሐረርጌ ዞን (21 ወረዳዎች) እና የምዕራብ ሐረርጌ ዞን (15 ወረዳዎች) ሳምንታዊ የሪፖርት አፈጻጸማቸውን እያጠናከሩ ይገኛሉ።`;
       t_recs = isArvl ? [
         'በአሰላ እና ጢዮ ለከፍተኛ አደጋ ተጋላጭ ለሆኑ እንስሳት አስቸኳይ የክበብ ክትባት',
@@ -392,14 +407,14 @@ app.post('/api/generate-narrative', async (req, res) => {
       t_exec = effectiveRecordsAnalyzed === 0
         ? 'Ulaagaa calallii filatame jalatti galmeen to\'annoo hin argamne.'
         : isArvl
-        ? `Yeroo gabaasaa (${effectivePeriod}) keessatti, Baara-bu'aa Qorannoo Fayyaa Beeyladaa Naannoo Asalla (ARVL) aanaalee 122 keessatti galmeewwan to'annoo ${effectiveRecordsAnalyzed} qaaccessuudhaan dhimmoota beeyladaa ${totalCases} fi du'a beeyladaa ${totalDeaths} galmeesseera. Raawwiin gabaasa zeeroo giddu-galeessaan ${complianceRate}% dha.`
-        : `Yeroo gabaasaa (${effectivePeriod}) keessatti, ${labName} galmeewwan to\'annoo ${effectiveRecordsAnalyzed} qaaccessuudhaan dhimmoota beeyladaa ${totalCases} fi du\'a beeyladaa ${totalDeaths} galmeesseera. Wiirtuulee dhibee ${effectiveOutbreaksCount} fi duula dirree ${effectiveMissionsCount} hordofeera.`;
+        ? `Yeroo gabaasaa (${effectivePeriod}) keessatti, ${officialLabNames.arvl.om} (ARVL) aanaalee 112 keessatti galmeewwan to'annoo ${effectiveRecordsAnalyzed} qaaccessuudhaan dhimmoota beeyladaa ${totalCases} fi du'a beeyladaa ${totalDeaths} galmeesseera. Raawwiin gabaasa zeeroo giddu-galeessaan ${complianceRate}% dha.`
+        : `Yeroo gabaasaa (${effectivePeriod}) keessatti, ${officialLabNames.hrvl.om} (HRVL) galmeewwan to\'annoo ${effectiveRecordsAnalyzed} qaaccessuudhaan dhimmoota beeyladaa ${totalCases} fi du\'a beeyladaa ${totalDeaths} galmeesseera. Wiirtuulee dhibee ${effectiveOutbreaksCount} fi duula dirree ${effectiveMissionsCount} hordofeera.`;
       t_status = isArvl
         ? `Dhibeewwan daddarboo adda-duree keessaa Dhibee Imiillaa (FMD) daandiiwwan daldalaa Asalla fi Adaamaa irratti, PPR beeyladoota xixiqqoo miidhu ifatti argamaniiru.`
         : `Dhibeewwan daddarboo adda-duree keessaa Dhibee Imiillaa (FMD) daandiiwwan daldalaa gurguddoo irratti, PPR beeyladoota xixiqqoo miidhu ifatti argamaniiru.`;
       t_species = `Loowwan baay\'ina dhimmootaa olaanaa kan qaban yoo ta\'u, beeyladoota xixiqqoo irratti dhibee sombaa fi PPR\'n du\'i dabaleera.`;
       t_zonal = isArvl 
-        ? `Kutaalee hojii 122 Baara-bu\'aa Qorannoo Fayyaa Beeyladaa Naannoo Asalla (ARVL) jalatti, raawwiin gabaasa zeeroo giddu-galeessaan ${complianceRate}% dha. Godinaaleen Arsi, Arsi Dhihaa, Baale, Baale Bahaa fi Shawaa gabaasa torbanii amansiisaa galmeessaniiru.` 
+        ? `Kutaalee hojii 112 ${officialLabNames.arvl.om} (ARVL) jalatti, raawwiin gabaasa zeeroo giddu-galeessaan ${complianceRate}% dha. Godinaaleen Arsi, Arsi Dhihaa, Baale, Baale Bahaa fi Shawaa gabaasa torbanii amansiisaa galmeessaniiru.` 
         : `Godinni H/Bahaa (Aanaalee 21) fi Godinni H/Dhihaa (Aanaalee 15) gabaasa torbanii amansiisaa galmeessaniiru.`;
       t_recs = isArvl ? [
         'Aanaalee Asella fi Tiyo keessatti beeyladoota balaa guddaa qabaniif talaallii marsaa hatattamaa',
@@ -437,21 +452,29 @@ app.post('/api/generate-narrative', async (req, res) => {
     }
 
     const persona = isArvl 
-      ? "Dr. Abdissa Lemma Bedada, ARVL Epi Surveillance Team Lead Epidemiologist & Admin of ARVL at the Asela Regional Veterinary Laboratory (ARVL)"
-      : "Dr. Henok Abebe T., Lead Veterinary Epidemiologist and Systems Developer at the Hirna Regional Veterinary Laboratory (HRVL)";
+      ? `Dr. Abdissa Lemma Bedada, ARVL Epi Surveillance Team Lead Epidemiologist & Admin of ARVL at the ${officialLabNames.arvl.en} (ARVL)`
+      : `Dr. Henok Abebe T., Lead Veterinary Epidemiologist and Systems Developer at the ${officialLabNames.hrvl.en} (HRVL)`;
 
     const prompt = `You are ${persona} in Oromia, Ethiopia.
 Your core mission: "Transform data into intelligence, intelligence into action, and action into healthier communities, animals, and ecosystems."
 
+CRITICAL INSTITUTIONAL NAMING MANDATE:
+- Target Laboratory Official Name for this report: "${officialLabName}" (${labShort})
+- When writing in ${targetLanguage}, you MUST refer to the laboratory by its EXACT official institutional name:
+  ${isArvl 
+    ? (locale === 'am' ? 'የአሰላ ቀጠና እንስሳት ጤና ላቦራቶሪ' : locale === 'om' ? 'Laboratoorii Eegumsaa faayaa beeylada G/G ASELA' : 'Asella Regional Veterinary Laboratory')
+    : (locale === 'am' ? 'የሂርና ቀጠና እንስሳት ጤና ላቦራቶሪ' : locale === 'om' ? 'Laboratoorii Eegumsaa faayaa beeylada G/G HIRNAA' : 'Hirna Regional Veterinary Laboratory')}
+- NEVER translate, transliterate, modify, capitalize, lowercase, or reword this official institutional name in titles, executive summary, recommendations, or headers.
+
 DATASET INTEGRITY & PROVENANCE MANDATES:
 1. Ground every statistical assertion STRICTLY in the current dashboard telemetry numbers provided below. NEVER hallucinate numbers that contradict this dataset.
 2. ${isArvl ? `CRITICAL ARVL DATA ISOLATION RULE:
-- This report is strictly for the Asela Regional Veterinary Laboratory (ARVL).
+- This report is strictly for the ${officialLabNames.arvl.en} (ARVL).
 - You MUST mention ONLY ARVL operational zones (Arsi, West Arsi, Bale, East Bale, East Shewa, North Shewa, Sheger City, Adama City, Shashamane City, Bishoftu City, Town-level operational units) and ARVL woredas (e.g. Asella, Tiyo, Dodola, Robe, Adama, Bishoftu, Sebeta, Ziway Dugda, Sinana, Gindhir).
 - NEVER mention Hararghe, Hirna, Chiro, Haramaya, Babile, Dadar, Habro, Mieso, or any HRVL operational areas or woredas.
 - Use ONLY the ARVL compliance statistics, case figures, and zonal breakdown provided in the telemetry below.
 - Zero HRVL references.` : `CRITICAL HRVL DATA ISOLATION RULE:
-- This report is strictly for the Hirna Regional Veterinary Laboratory (HRVL).
+- This report is strictly for the ${officialLabNames.hrvl.en} (HRVL).
 - You MUST mention ONLY HRVL operational zones (East Hararghe, West Hararghe) and HRVL woredas (e.g. Chiro, Haramaya, Babile, Dadar, Habro, Mieso, Bedeno).
 - NEVER mention Arsi, West Arsi, Bale, East Bale, Shewa, Asela, or any ARVL operational areas or woredas.
 - Zero ARVL references.`}

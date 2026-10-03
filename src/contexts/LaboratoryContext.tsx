@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { LaboratoryId, LaboratoryInfo, LABORATORIES_REGISTRY, PLATFORM_ALL_LABS_INFO, getAllLaboratoriesList } from '../data/laboratories';
+import { LaboratoryId, LaboratoryInfo, LABORATORIES_REGISTRY, PLATFORM_ALL_LABS_INFO, getAllLaboratoriesList, getOfficialLabName, OFFICIAL_LABORATORY_NAMES } from '../data/laboratories';
 import { useAuth } from './AuthContext';
+import { useI18n } from './I18nContext';
+import { Locale } from '../types';
 import { isUserApprovedForLab, getUserApprovedLaboratories, isSuperAdmin } from '../utils/rbac';
 import { formatLabHeader } from '../utils/laboratoryHelper';
 
-export { formatLabHeader };
+export { formatLabHeader, getOfficialLabName, OFFICIAL_LABORATORY_NAMES };
 
 interface LaboratoryContextType {
   selectedLab: LaboratoryId;
@@ -15,6 +17,7 @@ interface LaboratoryContextType {
   isMultiLabView: boolean;
   isLabLocked: boolean; // True if user is restricted to a single lab and cannot switch
   getLabHeader: (title: string) => string;
+  getLocalizedLabName: (labId?: string, overrideLocale?: Locale) => string;
 }
 
 const LaboratoryContext = createContext<LaboratoryContextType | undefined>(undefined);
@@ -23,6 +26,7 @@ const STORAGE_KEY = 'hrvl_selected_laboratory';
 
 export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, userProfile } = useAuth();
+  const { locale } = useI18n();
 
   // Helper to determine allowed labs for the current user
   const canAccessLaboratory = useCallback((labId: string): boolean => {
@@ -70,16 +74,26 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return true;
   }, [canAccessLaboratory, user]);
 
+  const getLocalizedLabName = useCallback((labId?: string, overrideLocale?: Locale): string => {
+    return getOfficialLabName(labId || selectedLab, overrideLocale || locale);
+  }, [selectedLab, locale]);
+
   const currentLabInfo = useMemo<LaboratoryInfo>(() => {
+    let baseLab: LaboratoryInfo;
     if (selectedLab === 'arvl') {
-      return LABORATORIES_REGISTRY.arvl;
+      baseLab = LABORATORIES_REGISTRY.arvl;
+    } else if (selectedLab === 'hrvl') {
+      baseLab = LABORATORIES_REGISTRY.hrvl;
+    } else {
+      baseLab = PLATFORM_ALL_LABS_INFO as unknown as LaboratoryInfo;
     }
-    if (selectedLab === 'hrvl') {
-      return LABORATORIES_REGISTRY.hrvl;
-    }
-    // 'all' Mode returns aggregate platform info
-    return PLATFORM_ALL_LABS_INFO as unknown as LaboratoryInfo;
-  }, [selectedLab]);
+    const localizedName = getOfficialLabName(selectedLab, locale);
+    return {
+      ...baseLab,
+      name: localizedName,
+      fullName: localizedName,
+    };
+  }, [selectedLab, locale]);
 
   const availableLaboratories = useMemo(() => {
     const list: { id: string; name: string; shortName: string; code: string; color: string }[] = [];
@@ -87,7 +101,11 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (canAccessLaboratory('all')) {
       list.push({
         id: 'all',
-        name: 'Multi-RVL National / Regional Aggregated Surveillance',
+        name: locale === 'am'
+          ? 'የኦሮሚያ ቀጠናዊ የእንስሳት ላቦራቶሪ የበሽታዎች ቅኝትና የመረጃ መረብ'
+          : locale === 'om'
+          ? 'Netwoorkii Qorannoo fi Odeeffannoo Dhibee Beeyladaa Naannoo Oromiyaa'
+          : 'ORVL Surveillance Intelligence Network',
         shortName: 'All Laboratories',
         code: 'ALL-RVL',
         color: '#7c3aed'
@@ -97,7 +115,7 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (canAccessLaboratory('hrvl')) {
       list.push({
         id: 'hrvl',
-        name: LABORATORIES_REGISTRY.hrvl.name,
+        name: getOfficialLabName('hrvl', locale),
         shortName: LABORATORIES_REGISTRY.hrvl.shortName,
         code: LABORATORIES_REGISTRY.hrvl.code,
         color: LABORATORIES_REGISTRY.hrvl.color
@@ -107,7 +125,7 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (canAccessLaboratory('arvl')) {
       list.push({
         id: 'arvl',
-        name: LABORATORIES_REGISTRY.arvl.name,
+        name: getOfficialLabName('arvl', locale),
         shortName: LABORATORIES_REGISTRY.arvl.shortName,
         code: LABORATORIES_REGISTRY.arvl.code,
         color: LABORATORIES_REGISTRY.arvl.color
@@ -115,7 +133,7 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     return list;
-  }, [canAccessLaboratory]);
+  }, [canAccessLaboratory, locale]);
 
   const isLabLocked = useMemo(() => {
     if (!userProfile) return true;
@@ -140,7 +158,8 @@ export const LaboratoryProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         canAccessLaboratory,
         isMultiLabView,
         isLabLocked,
-        getLabHeader
+        getLabHeader,
+        getLocalizedLabName
       }}
     >
       {children}

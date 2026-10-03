@@ -41,7 +41,7 @@ import { OutbreakMap } from './OutbreakMap';
 import { useI18n } from '../contexts/I18nContext';
 import { useLaboratory } from '../contexts/LaboratoryContext';
 import { HARARGHE_WOREDAS, ARSI_WOREDAS } from '../data/woredas';
-import { LABORATORIES_REGISTRY } from '../data/laboratories';
+import { LABORATORIES_REGISTRY, getOfficialLabName } from '../data/laboratories';
 import { generateInitialCompliance } from '../data/sampleData';
 
 const shortenDisease = (disease: string) => {
@@ -159,7 +159,7 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
   arvl: {
     id: 'arvl',
     refCode: 'ARVL-EPI-2026',
-    name: 'ASELA REGIONAL VETERINARY LABORATORY',
+    name: 'Asella Regional Veterinary Laboratory',
     subHeader: 'OROMIA AGRICULTURAL BUREAU • DISEASE SURVEILLANCE & EPIDEMIOLOGY',
     locationLine: 'Asela (Assela), Arsi Zone, Oromia Regional State, Ethiopia • Operational Area: Arsi, West Arsi, Bale, East Bale, East Shewa, North Shewa, Sheger City & Municipal Units (112 Target Units)',
     operationalAreaTitle: 'Arsi, West Arsi, Bale, East Bale, East Shewa, North Shewa, Sheger City & Municipal Units (112 Target Units)',
@@ -181,14 +181,14 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
       phone: '+251912293541; +251912313173',
       title: 'ARVL Epi Surveillance Team Lead Epidemiologist & Admin of ARVL',
       division: 'Regional Epizootiological Intelligence & Disease Analytics Dashboard',
-      organization: 'Asela Regional Veterinary Laboratory (ARVL)'
+      organization: 'Asella Regional Veterinary Laboratory (ARVL)'
     },
     approvedBy: {
       name: 'Lab Head: Dr. Abdi Yusuf Mohammed',
       email: 'koko2001f@gmail.com',
       phone: '+251911748478',
       title: 'Head of Laboratory',
-      organization: 'Asela Regional Veterinary Laboratory, Oromia'
+      organization: 'Asella Regional Veterinary Laboratory, Oromia'
     },
     defaultHighRiskWoredas: ['Asella', 'Tiyo', 'Dodola', 'Robe', 'Adama Zuria', 'Lume']
   }
@@ -503,9 +503,9 @@ export const PrintableReportView: React.FC<PrintableReportViewProps> = ({
       const avgTotal = Math.round(zoneCompliance.reduce((acc, z) => acc + z.compliance, 0) / (zoneCompliance.length || 1));
       const highest = [...zoneCompliance].sort((a, b) => b.compliance - a.compliance)[0];
       const lowest = [...zoneCompliance].sort((a, b) => a.compliance - b.compliance)[0];
-      return `Across the 122 operational units under Asela Regional Veterinary Laboratory (ARVL) jurisdiction, reporting compliance averages ${avgTotal}%. ${highest ? `${highest.zone} recorded high zonal reporting compliance at ${highest.compliance}%. ` : ''}${lowest && lowest.zone !== highest?.zone ? `${lowest.zone} registered ${lowest.compliance}% compliance with ongoing field expansion and mobile telemetry support.` : ''}`;
+      return `Across the 112 operational units under Asella Regional Veterinary Laboratory (ARVL) jurisdiction, reporting compliance averages ${avgTotal}%. ${highest ? `${highest.zone} recorded high zonal reporting compliance at ${highest.compliance}%. ` : ''}${lowest && lowest.zone !== highest?.zone ? `${lowest.zone} registered ${lowest.compliance}% compliance with ongoing field expansion and mobile telemetry support.` : ''}`;
     } else {
-      if (report.laboratoryId === 'hrvl' && report.zonalComplianceSummary && !report.zonalComplianceSummary.includes('Arsi') && !report.zonalComplianceSummary.includes('Asela') && !report.zonalComplianceSummary.includes('Bale')) {
+      if (report.laboratoryId === 'hrvl' && report.zonalComplianceSummary && !report.zonalComplianceSummary.includes('Arsi') && !report.zonalComplianceSummary.includes('Asella') && !report.zonalComplianceSummary.includes('Bale')) {
         return report.zonalComplianceSummary;
       }
       const ehComp = zoneCompliance.find(z => z.zone.includes('East') || z.zone.includes('E/H'))?.compliance || 68;
@@ -520,9 +520,9 @@ export const PrintableReportView: React.FC<PrintableReportViewProps> = ({
       if (report.laboratoryId === 'arvl' && !report.executiveSummary.includes('Hararghe') && !report.executiveSummary.includes('Hirna')) {
         return report.executiveSummary;
       }
-      return `During the reporting period (${report.dataProvenance?.reportingPeriod || 'Jul 2026 – Sep 2026'}), the Asela Regional Veterinary Laboratory (ARVL) coordinated disease surveillance across 122 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases.toLocaleString()} recorded cases, ${totalDeaths.toLocaleString()} animal fatalities). Active field surveillance monitored ${activeOutbreaks.length} active outbreak hotspots. Zero-reporting compliance currently averages ${Math.round(zoneCompliance.reduce((acc, z) => acc + z.compliance, 0) / (zoneCompliance.length || 1))}%.`;
+      return `During the reporting period (${report.dataProvenance?.reportingPeriod || 'Jul 2026 – Sep 2026'}), the Asella Regional Veterinary Laboratory (ARVL) coordinated disease surveillance across 112 operational units in Arsi, West Arsi, Bale, East Bale, Shewa, and urban centers. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases.toLocaleString()} recorded cases, ${totalDeaths.toLocaleString()} animal fatalities). Active field surveillance monitored ${activeOutbreaks.length} active outbreak hotspots. Zero-reporting compliance currently averages ${Math.round(zoneCompliance.reduce((acc, z) => acc + z.compliance, 0) / (zoneCompliance.length || 1))}%.`;
     } else {
-      if (report.laboratoryId === 'hrvl' && !report.executiveSummary.includes('Arsi') && !report.executiveSummary.includes('Asela')) {
+      if (report.laboratoryId === 'hrvl' && !report.executiveSummary.includes('Arsi') && !report.executiveSummary.includes('Asella')) {
         return report.executiveSummary;
       }
       return `During the reporting period (${report.dataProvenance?.reportingPeriod || 'Jul 2026 – Sep 2026'}), the Hirna Regional Veterinary Laboratory (HRVL) coordinated surveillance across operational woredas in East and West Hararghe. A total of ${activeRecords.length} field surveillance records were analyzed (${totalCases.toLocaleString()} recorded cases, ${totalDeaths.toLocaleString()} animal fatalities). Active field surveillance tracked ${activeOutbreaks.length} priority outbreak centers. Woreda zero-reporting compliance currently averages ${Math.round(zoneCompliance.reduce((acc, z) => acc + z.compliance, 0) / (zoneCompliance.length || 1))}%.`;
