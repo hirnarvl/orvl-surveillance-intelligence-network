@@ -125,48 +125,6 @@ export const FooterBanner: React.FC<FooterBannerProps> = () => {
         </div>
       </div>
 
-      {/* Section 2: Combined Developer Contact and Data Confidentiality & Legal Disclaimer in ONE SECTION */}
-      <section 
-        aria-label={t.footerCombinedSectionTitle || "Data Confidentiality, Legal Disclaimer & Developer Contact"}
-        className="bg-[#0b3330] p-[16px_20px] sm:p-[20px_28px] border-t border-white/12"
-      >
-        <div className="max-w-5xl 2xl:max-w-6xl space-y-3.5">
-          {/* Section Header */}
-          <div className="flex items-center gap-[10px] flex-wrap">
-            <svg className="w-[19px] h-[19px] shrink-0 text-[#f2c14e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <path d="M9 12l2 2 4-4"/>
-            </svg>
-            <span className="text-[13.5px] font-bold text-[#eafaf5] mr-auto tracking-[0.2px]">
-              {t.footerCombinedSectionTitle || 'Data Confidentiality, Legal Disclaimer & Developer Contact'}
-            </span>
-          </div>
-
-          {/* Legal Disclaimer & Data Governance Paragraphs (Justified Text) */}
-          <div className="pt-2 border-t border-white/5 text-[12.5px] leading-[1.65] text-[#bfe3d8] space-y-2.5">
-            <p className="m-0 text-justify">
-              {t.footerLegalDisclaimer}
-            </p>
-            <p className="m-0 text-justify">
-              <strong className="text-[#eafaf5]">{t.footerNetworkSyncLabel} </strong>
-              {t.footerNetworkSyncText}
-            </p>
-            <p className="m-0 text-justify">
-              <strong className="text-[#eafaf5]">{t.footerPrivacyComplianceLabel} </strong>
-              {t.footerPrivacyComplianceText}
-            </p>
-          </div>
-
-          {/* Unified Developer Contact Block (Inside this same section) */}
-          <div className="pt-3.5 border-t border-white/10">
-            <h4 className="text-[13.5px] font-bold text-[#f2c14e] tracking-[0.2px] mb-2.5 m-0">
-              {t.footerDeveloperContactTitle || 'Developer contact'}
-            </h4>
-            <DeveloperContactRow t={t} />
-          </div>
-        </div>
-      </section>
-
       {/* Expanded About & Legal Modal */}
       <AnimatePresence>
         {isAboutOpen && (

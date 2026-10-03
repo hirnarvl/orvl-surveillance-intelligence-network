@@ -650,7 +650,7 @@ export default function App() {
         )}
 
         {/* Main Workspace Container */}
-        <main className={`flex-1 w-full mx-auto transition-all duration-300 py-5 sm:py-6 pb-24 lg:pb-6 space-y-6 ${
+        <main className={`flex-1 w-full mx-auto transition-all duration-300 py-5 sm:py-6 pb-28 sm:pb-24 lg:pb-6 space-y-6 ${
           isPortraitMode 
             ? 'max-w-2xl px-3 sm:px-4 bg-slate-900/40 dark:bg-slate-900/60 rounded-3xl my-4 border border-indigo-500/20 shadow-2xl ring-1 ring-indigo-500/10' 
             : 'max-w-[1680px] 2xl:max-w-[1920px] px-3.5 sm:px-5 lg:px-6 xl:px-8'
@@ -1045,7 +1045,9 @@ export default function App() {
 
       {/* Footer Banner at the bottom of all dashboards */}
       {!isPrintFriendlyMode && (
-        <FooterBanner onOpenExternalResources={() => setIsExternalResourcesOpen(true)} />
+        <div className="pb-16 lg:pb-0 w-full">
+          <FooterBanner onOpenExternalResources={() => setIsExternalResourcesOpen(true)} />
+        </div>
       )}
       </div>
 

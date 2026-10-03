@@ -332,11 +332,11 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
             </div>
             <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
               <span className="flex items-center gap-1">
-                <Server className="w-3.5 h-3.5" />
+                <Server className="w-3.5 h-3.5 text-emerald-500" />
                 Target Firestore Database:
               </span>
-              <span className="font-mono text-[10px] text-slate-700 dark:text-slate-300 truncate max-w-[190px]" title="ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac">
-                ai-studio-hrvldataanalytic...
+              <span className="font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800" title="Target database is masked for security">
+                •••••••••••••••••••• (Masked)
               </span>
             </div>
           </div>

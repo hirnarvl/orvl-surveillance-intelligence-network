@@ -1043,87 +1043,139 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
           // ignore
         }
 
+        const cfrPercent = ob.cases > 0 ? ((ob.deaths / ob.cases) * 100).toFixed(1) : '0.0';
+        const mortalitySeverity = ob.deaths > 5 ? 'Critical Mortality' : ob.deaths > 0 ? 'Confirmed Fatalities' : 'Zero Recorded Deaths';
+        const mortalitySeverityColor = ob.deaths > 5 ? '#ef4444' : ob.deaths > 0 ? '#f97316' : '#10b981';
+        const diseaseEmoji = (profile as any).icon || (
+          ob.disease.toLowerCase().includes('foot') ? '🧬' :
+          ob.disease.toLowerCase().includes('peste') || ob.disease.toLowerCase().includes('ppr') ? '🐐' :
+          ob.disease.toLowerCase().includes('lumpy') ? '🐄' :
+          ob.disease.toLowerCase().includes('anthrax') ? '⚠️' :
+          ob.disease.toLowerCase().includes('rabies') ? '🐕' : '🦠'
+        );
+
         const hoverCardHtml = `
-          <div style="
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            width: 270px;
-            background: ${darkMode ? '#0f172a' : '#ffffff'};
+          <div class="outbreak-hover-card" style="
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            width: 290px;
+            background: ${darkMode ? 'rgba(15, 23, 42, 0.96)' : 'rgba(255, 255, 255, 0.98)'};
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: ${darkMode ? '#f8fafc' : '#0f172a'};
-            border: 1px solid ${darkMode ? '#334155' : '#cbd5e1'};
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, ${darkMode ? '0.6' : '0.15'}), 0 8px 10px -6px rgba(0, 0, 0, ${darkMode ? '0.4' : '0.1'});
-            padding: 10px 12px;
+            border: 1.5px solid ${darkMode ? 'rgba(51, 65, 85, 0.8)' : 'rgba(203, 213, 225, 0.9)'};
+            border-top: 3.5px solid ${color};
+            border-radius: 14px;
+            box-shadow: 0 16px 36px -6px rgba(0, 0, 0, ${darkMode ? '0.7' : '0.22'}), 0 4px 12px -2px rgba(0, 0, 0, ${darkMode ? '0.5' : '0.1'});
+            padding: 12px 14px 11px;
             text-align: left;
             pointer-events: none;
+            overflow: hidden;
           ">
-            <!-- Header Tag & Outbreak Code -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 6px;">
-              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; color: ${color}; text-transform: uppercase; background: ${isConfirmed ? 'rgba(239,68,68,0.12)' : 'rgba(245,158,11,0.12)'}; padding: 1.5px 6px; border-radius: 4px; border: 1px solid ${isConfirmed ? 'rgba(239,68,68,0.25)' : 'rgba(245,158,11,0.25)'};">
-                <span style="width: 5px; height: 5px; border-radius: 50%; background: ${color}; display: inline-block;"></span>
-                ${isConfirmed ? 'ACTIVE OUTBREAK' : 'SUSPECTED CLUSTER'}
+            <!-- Top Alert Badge & Code -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 7px;">
+              <span style="
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 9.5px;
+                font-weight: 800;
+                color: ${color};
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+                background: ${isConfirmed ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)'};
+                padding: 2.5px 7px;
+                border-radius: 6px;
+                border: 1px solid ${isConfirmed ? 'rgba(239, 68, 68, 0.28)' : 'rgba(245, 158, 11, 0.28)'};
+              ">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: ${color}; display: inline-block; box-shadow: 0 0 6px ${color};"></span>
+                ${isConfirmed ? 'Confirmed Outbreak' : 'Suspected Cluster'}
               </span>
-              <span style="font-size: 9.5px; font-weight: 700; color: ${darkMode ? '#94a3b8' : '#64748b'}; font-family: monospace;">
+              <span style="font-size: 10px; font-weight: 800; color: ${darkMode ? '#94a3b8' : '#64748b'}; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.2px;">
                 ${ob.outbreakCode || `#OB-${ob.id.slice(0, 6)}`}
               </span>
             </div>
 
-            <!-- Disease Name & Location -->
-            <div style="margin-bottom: 8px;">
-              <div style="font-size: 12.5px; font-weight: 900; color: ${isConfirmed ? '#ef4444' : '#f59e0b'}; line-height: 1.25;">
-                ${ob.disease}
+            <!-- Disease Name & Epidemiological Location -->
+            <div style="margin-bottom: 9px;">
+              <div style="
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+                font-size: 14.5px;
+                font-weight: 900;
+                color: ${darkMode ? '#ffffff' : '#0f172a'};
+                line-height: 1.25;
+                letter-spacing: -0.2px;
+              ">
+                <span style="font-size: 15px;">${diseaseEmoji}</span>
+                <span style="color: ${color};">${ob.disease}</span>
               </div>
-              <div style="display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: ${darkMode ? '#cbd5e1' : '#475569'}; margin-top: 2px; font-weight: 600;">
-                <span>📍 ${ob.woreda} Woreda</span>
+              <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: ${darkMode ? '#cbd5e1' : '#475569'}; margin-top: 3px; font-weight: 600;">
+                <span>📍 <b>${ob.woreda}</b> Woreda</span>
                 <span style="color: ${darkMode ? '#64748b' : '#94a3b8'};">•</span>
-                <span style="color: ${ob.zone === 'E/H' ? '#0284c7' : '#c026d3'}; font-weight: 700;">${ob.zone === 'E/H' ? 'East Hararghe' : 'West Hararghe'}</span>
+                <span style="color: ${ob.zone === 'E/H' ? '#38bdf8' : '#e879f9'}; font-weight: 700;">${ob.zone === 'E/H' ? 'East Hararghe' : 'West Hararghe'}</span>
               </div>
             </div>
 
-            <!-- 2-Column Key Metrics Card -->
+            <!-- Featured Metrics: Case Count & Death Count -->
             <div style="
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 6px;
-              background: ${darkMode ? '#1e293b' : '#f8fafc'};
-              border: 1px solid ${darkMode ? '#334155' : '#e2e8f0'};
-              border-radius: 8px;
-              padding: 6px 8px;
-              margin-bottom: 6px;
+              gap: 8px;
+              background: ${darkMode ? 'rgba(30, 41, 59, 0.7)' : 'rgba(241, 245, 249, 0.85)'};
+              border: 1px solid ${darkMode ? 'rgba(51, 65, 85, 0.7)' : 'rgba(226, 232, 240, 0.9)'};
+              border-radius: 10px;
+              padding: 8px 10px;
+              margin-bottom: 8px;
             ">
-              <div>
-                <div style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${darkMode ? '#94a3b8' : '#64748b'};">
-                  Total Cases
+              <!-- Case Count -->
+              <div style="border-right: 1px solid ${darkMode ? 'rgba(51, 65, 85, 0.6)' : 'rgba(226, 232, 240, 0.8)'}; padding-right: 4px;">
+                <div style="display: flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: ${darkMode ? '#94a3b8' : '#64748b'}; letter-spacing: 0.3px;">
+                  <span>📊</span> Case Count
                 </div>
-                <div style="font-size: 14px; font-weight: 900; color: ${color};">
-                  ${ob.cases} <span style="font-size: 9px; font-weight: 600; color: ${darkMode ? '#94a3b8' : '#64748b'};">cases</span>
+                <div style="font-size: 17px; font-weight: 900; color: ${color}; line-height: 1.2; margin-top: 2px;">
+                  ${Number(ob.cases).toLocaleString()}
                 </div>
-                <div style="font-size: 8.5px; color: ${darkMode ? '#94a3b8' : '#64748b'};">
-                  Morbidity: <b>${ob.morbidityRate ? `${ob.morbidityRate}%` : 'High'}</b>
+                <div style="font-size: 9px; color: ${darkMode ? '#94a3b8' : '#64748b'}; margin-top: 1px;">
+                  Morbidity: <b style="color: ${darkMode ? '#e2e8f0' : '#1e293b'};">${ob.morbidityRate ? `${ob.morbidityRate}%` : 'Elevated'}</b>
                 </div>
               </div>
 
-              <div>
-                <div style="font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: ${darkMode ? '#94a3b8' : '#64748b'};">
-                  Fatalities (CFR)
+              <!-- Death Count -->
+              <div style="padding-left: 4px;">
+                <div style="display: flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 800; text-transform: uppercase; color: ${ob.deaths > 0 ? '#ef4444' : (darkMode ? '#94a3b8' : '#64748b')}; letter-spacing: 0.3px;">
+                  <span>💀</span> Death Count
                 </div>
-                <div style="font-size: 14px; font-weight: 900; color: ${ob.deaths > 0 ? '#ef4444' : (darkMode ? '#94a3b8' : '#64748b')};">
-                  ${ob.deaths} <span style="font-size: 8.5px; font-weight: 700; color: #ef4444;">(${ob.cfr}% CFR)</span>
+                <div style="font-size: 17px; font-weight: 900; color: ${ob.deaths > 0 ? '#ef4444' : (darkMode ? '#94a3b8' : '#64748b')}; line-height: 1.2; margin-top: 2px;">
+                  ${Number(ob.deaths).toLocaleString()}
                 </div>
-                <div style="font-size: 8.5px; color: ${darkMode ? '#94a3b8' : '#64748b'};">
-                  Susceptible: <b>${ob.susceptible || 0}</b>
+                <div style="font-size: 9px; color: ${ob.deaths > 0 ? '#ef4444' : (darkMode ? '#94a3b8' : '#64748b')}; margin-top: 1px;">
+                  CFR: <b style="color: ${ob.deaths > 0 ? '#ef4444' : (darkMode ? '#cbd5e1' : '#475569')};">${cfrPercent}%</b>
                 </div>
+              </div>
+            </div>
+
+            <!-- Visual Fatality Ratio Bar -->
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; font-weight: 700; color: ${darkMode ? '#94a3b8' : '#64748b'}; margin-bottom: 3px;">
+                <span style="color: ${mortalitySeverityColor};">● ${mortalitySeverity}</span>
+                <span>${ob.cases > 0 ? `${Math.max(0, ob.cases - ob.deaths)} survivors` : ''}</span>
+              </div>
+              <div style="width: 100%; height: 5px; background: ${darkMode ? '#334155' : '#e2e8f0'}; border-radius: 4px; overflow: hidden; display: flex;">
+                <div style="width: ${Math.min(100, Math.max(5, (ob.deaths / Math.max(1, ob.cases)) * 100))}%; height: 100%; background: #ef4444;"></div>
+                <div style="flex: 1; height: 100%; background: ${color}; opacity: 0.7;"></div>
               </div>
             </div>
 
             <!-- Species Affected & Outbreak Date -->
-            <div style="font-size: 9.5px; line-height: 1.4; border-top: 1px solid ${darkMode ? '#1e293b' : '#e2e8f0'}; padding-top: 5px; margin-bottom: 6px;">
+            <div style="font-size: 10px; line-height: 1.45; border-top: 1px solid ${darkMode ? 'rgba(51, 65, 85, 0.6)' : 'rgba(226, 232, 240, 0.8)'}; padding-top: 6px; margin-bottom: 7px;">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
-                <span style="color: ${darkMode ? '#94a3b8' : '#64748b'}; font-weight: 600;">Species Affected:</span>
-                <span style="font-weight: 700; color: ${darkMode ? '#f1f5f9' : '#0f172a'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 155px;">
+                <span style="color: ${darkMode ? '#94a3b8' : '#64748b'}; font-weight: 600;">Species:</span>
+                <span style="font-weight: 700; color: ${darkMode ? '#f1f5f9' : '#0f172a'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 175px;">
                   ${formattedSpecies}
                 </span>
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 2px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 2.5px;">
                 <span style="color: ${darkMode ? '#94a3b8' : '#64748b'}; font-weight: 600;">Report Date:</span>
                 <span style="font-weight: 700; color: ${darkMode ? '#e2e8f0' : '#1e293b'};">
                   📅 ${ob.startDate} ${daysActiveText ? `• <span style="color: #38bdf8;">${daysActiveText}</span>` : ''}
@@ -1131,9 +1183,20 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
               </div>
             </div>
 
-            <!-- Quarantine SLA & Action Status -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 9px; font-weight: 700; background: ${darkMode ? '#020617' : '#f1f5f9'}; padding: 3px 6px; border-radius: 6px; border: 1px solid ${darkMode ? '#1e293b' : '#e2e8f0'};">
-              <span style="display: flex; align-items: center; gap: 3px; color: ${ob.quarantineApplied ? '#10b981' : '#f59e0b'};">
+            <!-- Quarantine SLA & Biosecurity Buffer -->
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 4px;
+              font-size: 9.5px;
+              font-weight: 700;
+              background: ${darkMode ? 'rgba(2, 6, 23, 0.75)' : 'rgba(241, 245, 249, 0.85)'};
+              padding: 4px 8px;
+              border-radius: 7px;
+              border: 1px solid ${darkMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(226, 232, 240, 0.9)'};
+            ">
+              <span style="display: flex; align-items: center; gap: 4px; color: ${ob.quarantineApplied ? '#10b981' : '#f59e0b'};">
                 <span>${ob.quarantineApplied ? '🔒' : '⚠️'}</span>
                 <span>${ob.quarantineApplied ? 'Quarantine Active' : 'No Quarantine'}</span>
               </span>
@@ -1142,9 +1205,9 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
               </span>
             </div>
 
-            <!-- Click Prompt -->
-            <div style="margin-top: 5px; text-align: center; font-size: 8.5px; color: ${darkMode ? '#64748b' : '#94a3b8'}; font-weight: 500;">
-              👉 Click marker for Full Inspector, Buffer Ring & Weather
+            <!-- Action Prompt -->
+            <div style="margin-top: 6px; text-align: center; font-size: 9px; color: ${darkMode ? '#64748b' : '#94a3b8'}; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 3px;">
+              <span>👆</span> <span>Click marker for Inspector, Buffer & Weather</span>
             </div>
           </div>
         `;
@@ -1152,7 +1215,7 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
         marker.bindTooltip(hoverCardHtml, {
           sticky: false,
           direction: 'top',
-          offset: [0, -18],
+          offset: [0, -22],
           className: 'hrvl-hovercard-tooltip',
           opacity: 1.0
         });
@@ -1212,18 +1275,46 @@ export const OutbreakMap: React.FC<OutbreakMapProps> = ({
 
         const invMarker = L.marker([inv.lat || 9.2, inv.lng || 41.1], { icon: invIcon });
         invMarker.bindTooltip(`
-          <div style="font-family: sans-serif; padding: 4px 6px;">
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; color: #059669; text-transform: uppercase; margin-bottom: 2px;">
-              <span style="width: 5px; height: 5px; border-radius: 50%; background: #059669; display: inline-block;"></span>
-              LIVE FIELD MISSION
+          <div class="outbreak-hover-card" style="
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            width: 230px;
+            background: ${darkMode ? 'rgba(15, 23, 42, 0.96)' : 'rgba(255, 255, 255, 0.98)'};
+            color: ${darkMode ? '#f8fafc' : '#0f172a'};
+            border: 1.5px solid ${darkMode ? 'rgba(51, 65, 85, 0.8)' : 'rgba(203, 213, 225, 0.9)'};
+            border-top: 3px solid #10b981;
+            border-radius: 12px;
+            box-shadow: 0 14px 28px -4px rgba(0, 0, 0, ${darkMode ? '0.6' : '0.15'});
+            padding: 10px 12px;
+            text-align: left;
+            pointer-events: none;
+          ">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 5px;">
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; color: #10b981; text-transform: uppercase; background: rgba(16, 185, 129, 0.12); padding: 2px 6px; border-radius: 5px; border: 1px solid rgba(16, 185, 129, 0.25);">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                Live Field Mission
+              </span>
+              <span style="font-size: 9.5px; font-weight: 700; color: ${darkMode ? '#94a3b8' : '#64748b'}; font-family: ui-monospace, monospace;">
+                ${inv.investigationCode || `#FM-${inv.id.slice(0, 6)}`}
+              </span>
             </div>
-            <b style="color: #059669; font-size: 11px;">🔬 Field Mission: ${inv.investigationCode || inv.id}</b>
-            <div style="font-size: 10px; color: #475569; margin-top: 2px;">
-              <b>Woreda:</b> ${inv.woreda} (${inv.zone})<br/>
-              <b>Diagnosis:</b> ${inv.disease || inv.title}
+            <div style="font-size: 13px; font-weight: 800; color: ${darkMode ? '#ffffff' : '#0f172a'}; margin-bottom: 3px;">
+              🔬 ${inv.disease || inv.title}
             </div>
+            <div style="font-size: 10.5px; color: ${darkMode ? '#cbd5e1' : '#475569'}; margin-top: 2px;">
+              📍 <b>${inv.woreda}</b> Woreda (${inv.zone})
+            </div>
+            ${(inv as any).farmerName || (inv as any).leadInvestigator ? `
+            <div style="font-size: 9.5px; color: ${darkMode ? '#94a3b8' : '#64748b'}; margin-top: 4px; border-top: 1px solid ${darkMode ? '#334155' : '#e2e8f0'}; pt-1;">
+              Reporter: <b>${(inv as any).farmerName || (inv as any).leadInvestigator}</b>
+            </div>` : ''}
           </div>
-        `, { sticky: true });
+        `, { 
+          sticky: false, 
+          direction: 'top', 
+          offset: [0, -18],
+          className: 'hrvl-hovercard-tooltip', 
+          opacity: 1.0 
+        });
 
         survGroup.addLayer(invMarker);
       });

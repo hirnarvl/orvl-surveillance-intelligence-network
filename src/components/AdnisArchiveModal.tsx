@@ -339,7 +339,7 @@ export const AdnisArchiveModal: React.FC<AdnisArchiveModalProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800 bg-slate-900/90 text-xs text-slate-400">
           <div className="flex items-center gap-1.5">
             <Database className="w-3.5 h-3.5 text-slate-500" />
-            <span>Target Database: <code className="text-slate-300 font-mono">ai-studio-hrvldataanalytic-...</code></span>
+            <span>Target Database: <code className="text-emerald-400 font-mono bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800">•••••••••••••••••••• (Masked)</code></span>
           </div>
           <button
             onClick={onClose}
