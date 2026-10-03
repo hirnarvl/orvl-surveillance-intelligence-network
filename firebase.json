@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "orvl-surveillance-intelegence-net",
     "public": "dist",
     "ignore": [
       "firebase.json",

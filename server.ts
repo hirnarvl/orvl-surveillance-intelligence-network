@@ -505,7 +505,7 @@ Generate a comprehensive, publication-ready Epidemiological Narrative Summary & 
 
     Return ONLY raw valid JSON.`;
 
-    const candidateModels = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    const candidateModels = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
     let narrativeText = '';
 
     for (const modelName of candidateModels) {
@@ -720,7 +720,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get(/.*/, (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
