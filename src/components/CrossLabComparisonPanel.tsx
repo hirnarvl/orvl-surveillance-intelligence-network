@@ -83,14 +83,14 @@ export const CrossLabComparisonPanel: React.FC = () => {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center space-x-3">
                   <div 
-                    className="w-11 h-11 rounded-xl p-0.5 flex items-center justify-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs shrink-0 overflow-hidden"
+                    className="w-12 h-12 flex items-center justify-center shrink-0"
                   >
                     {regInfo?.logoUrl && regInfo.logoUrl.trim() !== '' ? (
                       <img 
                         src={regInfo.logoUrl} 
                         alt={`${lab.laboratoryName} Emblem`}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-contain" 
+                        className="w-full h-full object-contain filter drop-shadow-md" 
                       />
                     ) : (
                       <div 

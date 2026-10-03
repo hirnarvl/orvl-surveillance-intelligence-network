@@ -50,15 +50,12 @@ export const AccountStatusScreen: React.FC = () => {
       {/* Top Bar */}
       <header className="max-w-4xl w-full mx-auto flex items-center justify-between pb-6 border-b border-slate-800">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-md flex items-center justify-center">
+          <div className="w-12 h-12 shrink-0 flex items-center justify-center">
             <img 
-              src={isArvl 
-                ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R' 
-                : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom'
-              } 
+              src={isArvl ? '/arvl-emblem.png' : '/hrvl-emblem.png'} 
               alt="Lab Emblem" 
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain" 
+              className="w-full h-full object-contain filter drop-shadow-md" 
             />
           </div>
           <div>

@@ -38,8 +38,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLa
 
   const isArvl = modalLab === 'arvl';
   const logoSrc = isArvl
-    ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R'
-    : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom';
+    ? '/arvl-emblem.png'
+    : '/hrvl-emblem.png';
   const labName = isArvl
     ? 'Asela Regional Veterinary Laboratory'
     : 'Hirna Regional Veterinary Laboratory';
@@ -206,12 +206,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLa
         {/* Header with Lab Selector */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-between border-b border-slate-700/50">
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-xl bg-white p-1.5 shadow-md shrink-0 flex items-center justify-center">
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center">
               <img 
                 src={logoSrc} 
                 alt={`${labShort} Emblem`} 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-contain filter drop-shadow-xs" 
+                className="w-full h-full object-contain filter drop-shadow-md" 
               />
             </div>
             <div>

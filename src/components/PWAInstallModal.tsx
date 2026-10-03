@@ -39,7 +39,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
 
   const logoSrc = (currentLabInfo?.logoUrl && currentLabInfo.logoUrl.trim() !== '')
     ? currentLabInfo.logoUrl
-    : (selectedLab === 'arvl' ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R' : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom');
+    : (selectedLab === 'arvl' ? '/arvl-emblem.png' : '/hrvl-emblem.png');
   const labName = currentLabInfo?.name || (selectedLab === 'arvl' ? 'Asela Regional Veterinary Laboratory' : 'Hirna Regional Veterinary Laboratory');
   const modalTitle = selectedLab === 'arvl'
     ? 'Install ARVL Dashboard'
@@ -66,11 +66,13 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
             <div className="flex items-center gap-3">
               {logoSrc ? (
-                <img 
-                  src={logoSrc} 
-                  alt={labName} 
-                  className="w-10 h-10 object-contain rounded-lg p-0.5 bg-slate-900 border border-slate-700 shadow-sm"
-                />
+                <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+                  <img 
+                    src={logoSrc} 
+                    alt={labName} 
+                    className="w-full h-full object-contain filter drop-shadow-md"
+                  />
+                </div>
               ) : null}
               <div>
                 <h3 id="pwa-modal-title" className="text-base font-bold text-slate-900 dark:text-white leading-tight">

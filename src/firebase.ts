@@ -5,6 +5,7 @@ import {
   Firestore 
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
 import firebaseConfigJson from "../firebase-applet-config.json";
 
 // Set Firestore log level to silent to prevent SDK-level error emissions for expected offline transitions
@@ -62,16 +63,26 @@ const activeConfig = {
   projectId: jsonCfg.projectId || (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) || '',
   storageBucket: jsonCfg.storageBucket || (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || (jsonCfg.projectId ? `${jsonCfg.projectId}.firebasestorage.app` : ''),
   messagingSenderId: jsonCfg.messagingSenderId || (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || '',
-  appId: jsonCfg.appId || (import.meta.env.VITE_FIREBASE_APP_ID as string) || ''
+  appId: jsonCfg.appId || (import.meta.env.VITE_FIREBASE_APP_ID as string) || '',
+  measurementId: jsonCfg.measurementId || (import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string) || ''
 };
 
 const app = !getApps().length ? initializeApp(activeConfig) : getApp();
 
-const rawDbId = (firebaseConfigJson && (firebaseConfigJson as { firestoreDatabaseId?: string }).firestoreDatabaseId) 
-  || "ai-studio-hrvldataanalytic-84b8fec2-2107-46fd-9e7d-cc69019e0bac";
-const targetDbId = (rawDbId && rawDbId !== '(default)') ? rawDbId : undefined;
+let analytics: Analytics | null = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {
+    // Analytics unsupported in current environment
+  });
+}
 
-export const db: Firestore = targetDbId ? getFirestore(app, targetDbId) : getFirestore(app);
+export { analytics };
+
+export const db: Firestore = getFirestore(app, firebaseConfigJson.firestoreDatabaseId);
 export const auth = getAuth(app);
 
 // Gracefully handle connection state testing according to standard guidelines

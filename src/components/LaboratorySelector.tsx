@@ -90,11 +90,13 @@ export const LaboratorySelector: React.FC<LaboratorySelectorProps> = ({
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2 min-w-0">
-          {isMultiLabView ? (
-            <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
-          ) : (
-            <Building2 className={`w-4 h-4 shrink-0 ${selectedLab === 'arvl' ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'}`} />
-          )}
+          <div className="w-4 h-4 shrink-0 flex items-center justify-center">
+            <img 
+              src={isMultiLabView ? '/orvl-emblem.png' : selectedLab === 'arvl' ? '/arvl-emblem.png' : '/hrvl-emblem.png'} 
+              alt="Lab Emblem" 
+              className="w-full h-full object-contain filter drop-shadow-xs" 
+            />
+          </div>
 
           <span className="truncate">
             {currentLabInfo.shortName}
@@ -151,20 +153,12 @@ export const LaboratorySelector: React.FC<LaboratorySelectorProps> = ({
                     }`}
                     role="menuitem"
                   >
-                    <div className="mt-0.5 shrink-0">
-                      {isAll ? (
-                        <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                          <Layers className="w-4 h-4" />
-                        </div>
-                      ) : isArvl ? (
-                        <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                          <Building2 className="w-4 h-4" />
-                        </div>
-                      ) : (
-                        <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                          <Building2 className="w-4 h-4" />
-                        </div>
-                      )}
+                    <div className="mt-0.5 shrink-0 w-5 h-5 flex items-center justify-center">
+                      <img 
+                        src={isAll ? '/orvl-emblem.png' : isArvl ? '/arvl-emblem.png' : '/hrvl-emblem.png'} 
+                        alt={`${lab.name} Emblem`} 
+                        className="w-full h-full object-contain filter drop-shadow-xs" 
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">

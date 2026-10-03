@@ -38,7 +38,7 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({
 
   const logoSrc = (currentLabInfo?.logoUrl && currentLabInfo.logoUrl.trim() !== '')
     ? currentLabInfo.logoUrl
-    : (selectedLab === 'arvl' ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R' : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom');
+    : (selectedLab === 'arvl' ? '/arvl-emblem.png' : '/hrvl-emblem.png');
   const appTitle = selectedLab === 'arvl' 
     ? 'Install ARVL Dashboard' 
     : selectedLab === 'hrvl' 
@@ -63,11 +63,13 @@ export const PWAInstallBanner: React.FC<PWAInstallBannerProps> = ({
 
         <div className="flex items-start gap-3 relative">
           {logoSrc ? (
-            <img 
-              src={logoSrc} 
-              alt={currentLabInfo?.name || 'Laboratory Logo'} 
-              className="w-11 h-11 object-contain rounded-xl p-0.5 bg-slate-950 border border-slate-700/80 shrink-0 shadow-md"
-            />
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+              <img 
+                src={logoSrc} 
+                alt={currentLabInfo?.name || 'Laboratory Logo'} 
+                className="w-full h-full object-contain filter drop-shadow-md"
+              />
+            </div>
           ) : null}
 
           <div className="flex-1 min-w-0 pr-4">

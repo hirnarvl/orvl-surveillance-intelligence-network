@@ -431,12 +431,12 @@ export const AIReportModal: React.FC<AIReportModalProps> = ({
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 shrink-0 gap-3">
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 p-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 shrink-0 flex items-center justify-center">
               <img
-                src={isArvl ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R' : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom'}
+                src={isArvl ? '/arvl-emblem.png' : '/hrvl-emblem.png'}
                 alt={`${labShort} Emblem`}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-contain filter drop-shadow-xs"
+                className="w-full h-full object-contain filter drop-shadow-md"
               />
             </div>
             <div>

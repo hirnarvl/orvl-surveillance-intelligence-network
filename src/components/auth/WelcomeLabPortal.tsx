@@ -33,12 +33,12 @@ export const WelcomeLabPortal: React.FC = () => {
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-white p-1 shadow-md border border-slate-700/60 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
               <img 
                 src="/orvl-emblem.png" 
                 alt="ORVL Network Emblem" 
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-contain" 
+                className="w-full h-full object-contain filter drop-shadow-md" 
               />
             </div>
             <div>
@@ -84,6 +84,49 @@ export const WelcomeLabPortal: React.FC = () => {
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
             Welcome to the Oromia Veterinary Surveillance Network. Access to diagnostic records, ODK submissions, outbreak alerts, and epidemiological data requires institutional authentication and approved laboratory authorization.
           </p>
+
+          {/* Equal Size Triple Emblem Showcase: ORVL, HRVL, ARVL */}
+          <div className="flex items-center justify-center gap-6 sm:gap-10 pt-4 pb-2">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shrink-0">
+                <img 
+                  src="/orvl-emblem.png" 
+                  alt="ORVL Network Emblem" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain filter drop-shadow-md" 
+                />
+              </div>
+              <span className="text-[11px] font-bold text-slate-300">ORVL Network</span>
+            </div>
+
+            <div className="h-10 w-px bg-slate-700/60" />
+
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shrink-0">
+                <img 
+                  src="/hrvl-emblem.png" 
+                  alt="HRVL Emblem" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain filter drop-shadow-md" 
+                />
+              </div>
+              <span className="text-[11px] font-bold text-emerald-400">HRVL Center</span>
+            </div>
+
+            <div className="h-10 w-px bg-slate-700/60" />
+
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shrink-0">
+                <img 
+                  src="/arvl-emblem.png" 
+                  alt="ARVL Emblem" 
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain filter drop-shadow-md" 
+                />
+              </div>
+              <span className="text-[11px] font-bold text-blue-400">ARVL Center</span>
+            </div>
+          </div>
         </div>
 
         {/* Dual Cards: HRVL & ARVL */}
@@ -96,12 +139,12 @@ export const WelcomeLabPortal: React.FC = () => {
             <div>
               {/* Header with Emblem */}
               <div className="flex items-start justify-between gap-4 mb-6">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2.5 shadow-lg border border-slate-600/40 flex items-center justify-center shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
                   <img 
-                    src="https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom" 
+                    src="/hrvl-emblem.png" 
                     alt="HRVL Emblem" 
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-contain filter drop-shadow-xs" 
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-200 group-hover:scale-105" 
                   />
                 </div>
                 <div className="text-right">
@@ -162,12 +205,12 @@ export const WelcomeLabPortal: React.FC = () => {
             <div>
               {/* Header with Emblem */}
               <div className="flex items-start justify-between gap-4 mb-6">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white p-2.5 shadow-lg border border-slate-600/40 flex items-center justify-center shrink-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
                   <img 
-                    src="https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R" 
+                    src="/arvl-emblem.png" 
                     alt="ARVL Emblem" 
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-contain filter drop-shadow-xs" 
+                    className="w-full h-full object-contain filter drop-shadow-md transition-transform duration-200 group-hover:scale-105" 
                   />
                 </div>
                 <div className="text-right">

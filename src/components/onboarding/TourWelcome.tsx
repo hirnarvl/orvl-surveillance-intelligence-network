@@ -50,8 +50,8 @@ export const TourWelcome: React.FC<TourWelcomeProps> = ({
   const { selectedLab } = useLaboratory();
   const isArvl = selectedLab === 'arvl';
   const logoSrc = isArvl
-    ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R'
-    : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom';
+    ? '/arvl-emblem.png'
+    : '/hrvl-emblem.png';
   const content = TOUR_WELCOME_CONTENT;
 
   // Speak welcome narration in selected language if voice enabled
@@ -93,12 +93,12 @@ export const TourWelcome: React.FC<TourWelcomeProps> = ({
 
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center space-x-3">
-              <div className="h-11 w-11 p-1 bg-white rounded-2xl shadow-md shrink-0 flex items-center justify-center">
+              <div className="h-12 w-12 shrink-0 flex items-center justify-center">
                 <img 
                   src={logoSrc} 
                   alt={isArvl ? 'ARVL Emblem' : 'HRVL Emblem'} 
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-contain" 
+                  className="w-full h-full object-contain filter drop-shadow-md" 
                 />
               </div>
               <div className="text-left">

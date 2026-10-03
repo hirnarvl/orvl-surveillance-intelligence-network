@@ -292,7 +292,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const currentLogoSrc = (currentLabInfo?.logoUrl && currentLabInfo.logoUrl.trim() !== '')
     ? currentLabInfo.logoUrl
-    : (selectedLab === 'arvl' ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R' : '/orvl-emblem.png');
+    : (selectedLab === 'arvl' ? '/arvl-emblem.png' : selectedLab === 'hrvl' ? '/hrvl-emblem.png' : '/orvl-emblem.png');
   const currentLogoAlt = `${currentLabInfo?.shortName || 'RVL'} Emblem`;
 
   return (

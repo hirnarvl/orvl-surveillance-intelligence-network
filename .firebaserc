@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "igneous-fabric-91ttq"
+  },
+  "targets": {
+    "igneous-fabric-91ttq": {
+      "hosting": {
+        "orvl-surveillance-intelegence-net": [
+          "orvl-surveillance-intelegence-net"
+        ]
+      }
+    }
   }
 }

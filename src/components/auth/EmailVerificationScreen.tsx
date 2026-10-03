@@ -26,8 +26,8 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
 
   const isArvl = selectedLab === 'arvl';
   const logoSrc = isArvl
-    ? 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R'
-    : 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom';
+    ? '/arvl-emblem.png'
+    : '/hrvl-emblem.png';
   const labName = isArvl
     ? 'Asela Regional Veterinary Laboratory (ARVL)'
     : 'Hirna Regional Veterinary Laboratory (HRVL)';
@@ -50,12 +50,12 @@ export const EmailVerificationScreen: React.FC<EmailVerificationScreenProps> = (
       {/* Top Header */}
       <header className="max-w-4xl w-full mx-auto flex items-center justify-between pb-6 border-b border-slate-800">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1.5 shadow-md flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 shrink-0 flex items-center justify-center">
             <img 
               src={logoSrc} 
               alt="Laboratory Emblem" 
               referrerPolicy="no-referrer"
-              className="w-full h-full object-contain" 
+              className="w-full h-full object-contain filter drop-shadow-md" 
             />
           </div>
           <div>

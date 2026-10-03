@@ -131,8 +131,8 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
     targetWoredasLabel: '36 Woredas',
     geographicCoverageText: '36 Target Woredas (21 East Hararghe, 15 West Hararghe), Oromia Regional State, Ethiopia',
     dataSourceLabel: 'HRVL Dashboard Dataset (ADNIS)',
-    logoUrl: 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom',
-    fallbackLogoUrl: '/hrvl-emblem.png',
+    logoUrl: '/hrvl-emblem.png',
+    fallbackLogoUrl: 'https://lh3.googleusercontent.com/d/1LzxKTsj6b4TO1aIyI-tAddDsR5QMYYom',
     stampUrl: 'https://lh3.googleusercontent.com/d/1OJjrNkBatUTBsmxT3-DWlL_BdNU1f0Qe',
     colorTheme: 'emerald',
     badgeBg: 'bg-blue-50',
@@ -167,8 +167,8 @@ const LAB_REPORT_CONFIGS: Record<'hrvl' | 'arvl', LabReportConfig> = {
     targetWoredasLabel: '112 Units',
     geographicCoverageText: '112 Target Operational Woredas/Units across Central-Eastern Oromia (Arsi, West Arsi, Bale, East Bale, East Shewa, North Shewa, Sheger City), Ethiopia',
     dataSourceLabel: 'ARVL Dashboard Dataset (ADNIS)',
-    logoUrl: 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R',
-    fallbackLogoUrl: '/arvl-emblem.png',
+    logoUrl: '/arvl-emblem.png',
+    fallbackLogoUrl: 'https://lh3.googleusercontent.com/d/1ramCieRBgrY-MWZteIHalwv5vYbIy36R',
     stampUrl: 'https://lh3.googleusercontent.com/d/1ZDOhhyJOrlX0R8A0rX1bgkc9DJDEhInl',
     colorTheme: 'emerald',
     badgeBg: 'bg-emerald-50',
@@ -870,7 +870,7 @@ Status: Verified & Distributed`}
           
           {/* Left: Interchanging Logo & Institutional Names */}
           <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 sm:w-22 sm:h-22 p-1 bg-white border border-slate-200 rounded-xl shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-20 h-20 sm:w-22 sm:h-22 flex items-center justify-center shrink-0">
               <img 
                 src={logoLoadError ? labConfig.fallbackLogoUrl : labConfig.logoUrl} 
                 alt={`${labConfig.name} Emblem`} 
@@ -878,7 +878,7 @@ Status: Verified & Distributed`}
                 onError={() => {
                   if (!logoLoadError) setLogoLoadError(true);
                 }}
-                className="w-full h-full object-contain" 
+                className="w-full h-full object-contain filter drop-shadow-sm" 
               />
             </div>
 
